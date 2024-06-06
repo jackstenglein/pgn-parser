@@ -2,65 +2,68 @@
     var messages = [];
 
     function addMessage(json) {
-        var o = Object.assign(json, location()); messages.push(o); return o;
+        var o = Object.assign(json, location()); 
+        messages.push(o); 
+        return o;
     }
 
     function makeInteger(o) {
         return parseInt(o.join(""), 10);
     }
+
     function mi(o) {
-        return o.join("").match(/\?/) ? o.join("") : makeInteger(o); }
+        return o.join("").match(/\?/) ? o.join("") : makeInteger(o); 
+    }
 
-  function merge(array) {
-    var ret = {}
-   // return array
-    array.forEach(function(json) {
-      for (var key in json) {
-        if (Array.isArray(json[key])) {
-            ret[key] = ret[key] ? ret[key].concat(json[key]) : json[key]
-        } else {
-            ret[key] = ret[key] ? trimEnd(ret[key]) + " " + trimStart(json[key]) : json[key]
-        }
-      }
-    })
-    return ret
-  }
+    function merge(array) {
+        var ret = {}    
+        array.forEach(function(json) {
+            for (var key in json) {
+                if (Array.isArray(json[key])) {
+                    ret[key] = ret[key] ? ret[key].concat(json[key]) : json[key]
+                } else {
+                    ret[key] = ret[key] ? trimEnd(ret[key]) + " " + trimStart(json[key]) : json[key]
+                }
+            }
+        })
+        return ret
+    }
 
-  function trimStart(st) {
-    if (typeof st !== "string") return st
-    var r=/^\s+/
-    return st.replace(r,'')
-  }
+    function trimStart(st) {
+        if (typeof st !== "string") return st
+        var r=/^\s+/
+        return st.replace(r, '')
+    }
 
-  function trimEnd(st) {
-    if (typeof st !== "string") return st
-    var r=/\s+$/
-    return st.replace(r,'')
-  }
-
+    function trimEnd(st) {
+        if (typeof st !== "string") return st
+        var r=/\s+$/
+        return st.replace(r, '')
+    }
 }
 
-BOM = "\uFEFF"
+BOM "Byte Order Mark" = "\uFEFF"
 
-games = BOM? ws games:(
-       head:game
-         tail:(ws m:game { return m; })*
-         {
-            //console.log("Length tail: " + tail.length);
-            return [head].concat(tail) }
-       )? {
-            //console.log("Length: " + games.length);
-            return games; }
-
-game = BOM? t:tags? c:comments? p:pgn
+games = BOM? whitespaceOptional games:(
+    head:game 
+    tail:(whitespaceOptional m:game { return m; })*
     {
-      //console.log("Length pgn: " + p.length);
-      var mess = messages; messages = [];
-      return { tags: t, gameComment: c, moves: p, messages: mess }; }
+        return [head].concat(tail) 
+    }
+)? {
+  return games; 
+}
 
-tags = BOM? ws members:(
+game = BOM? tags:tags? gameComment:comments? moves:pgn
+    {
+        var mess = messages; 
+        messages = [];
+        return { tags, gameComment, moves, messages: mess }; 
+    }
+
+tags = BOM? whitespaceOptional members:(
       head:tag
-      tail:(ws m:tag { return m; })*
+      tail:(whitespaceOptional m:tag { return m; })*
       {
         var result = {};
         [head].concat(tail).forEach(function(element) {
@@ -68,67 +71,73 @@ tags = BOM? ws members:(
         });
         return result;
       }
-    )? ws
-    { if (members === null) return {};
-      members.messages = messages; return members;}
+    )? whitespaceOptional
+    { 
+        if (members === null) return {};
+        members.messages = messages; 
+        return members;
+    }
 
 
-tag = bl ws tag:tagKeyValue ws br { return tag; }
+tag = openBracket whitespaceOptional tag:tagKeyValue whitespaceOptional closeBracket { return tag; }
 
-tagKeyValue = eventKey ws value:string { return { name: 'Event', value: value }; }
-	/ siteKey ws value:string  { return { name: 'Site', value: value }; }
-	/ dateKey ws value:dateString  { return { name: 'Date', value: value }; }
-	/ roundKey ws value:string  { return { name: 'Round', value: value }; }
-	/ whiteTitleKey ws value:string  { return { name: 'WhiteTitle', value: value }; }
-	/ blackTitleKey ws value:string  { return { name: 'BlackTitle', value: value }; }
-	/ whiteEloKey ws value:integerOrDashString  { return { name: 'WhiteElo', value: value }; }
-	/ blackEloKey ws value:integerOrDashString  { return { name: 'BlackElo', value: value }; }
-	/ whiteUSCFKey ws value:integerString  { return { name: 'WhiteUSCF', value: value }; }
-	/ blackUSCFKey ws value:integerString  { return { name: 'BlackUSCF', value: value }; }
-	/ whiteNAKey ws value:string  { return { name: 'WhiteNA', value: value }; }
-	/ blackNAKey ws value:string  { return { name: 'BlackNA', value: value }; }
-	/ whiteTypeKey ws value:string  { return { name: 'WhiteType', value: value }; }
-	/ blackTypeKey ws value:string  { return { name: 'BlackType', value: value }; }
-	/ whiteKey ws value:string  { return { name: 'White', value: value }; }
-	/ blackKey ws value:string  { return { name: 'Black', value: value }; }
-	/ resultKey ws value:result  { return { name: 'Result', value: value }; }
-	/ eventDateKey ws value:dateString  { return { name: 'EventDate', value: value }; }
-	/ eventSponsorKey ws value:string  { return { name: 'EventSponsor', value: value }; }
-	/ sectionKey ws value:string  { return { name: 'Section', value: value }; }
-	/ stageKey ws value:string  { return { name: 'Stage', value: value }; }
-	/ boardKey ws value:integerString  { return { name: 'Board', value: value }; }
-	/ openingKey ws value:string  { return { name: 'Opening', value: value }; }
-	/ variationKey ws value:string  { return { name: 'Variation', value: value }; }
-	/ subVariationKey ws value:string  { return { name: 'SubVariation', value: value }; }
-	/ ecoKey ws value:string  { return { name: 'ECO', value: value }; }
-	/ nicKey ws value:string  { return { name: 'NIC', value: value }; }
-	/ timeKey ws value:timeString  { return { name: 'Time', value: value }; }
-	/ utcTimeKey ws value:timeString  { return { name: 'UTCTime', value: value }; }
-	/ utcDateKey ws value:dateString  { return { name: 'UTCDate', value: value }; }
-	/ timeControlKey ws value:timeControl  { return { name: 'TimeControl', value: value }; }
-	/ setUpKey ws value:string  { return { name: 'SetUp', value: value }; }
-	/ fenKey ws value:string  { return { name: 'FEN', value: value }; }
-	/ terminationKey ws value:string  { return { name: 'Termination', value: value }; }
-	/ annotatorKey ws value:string  { return { name: 'Annotator', value: value }; }
-	/ modeKey ws value:string  { return { name: 'Mode', value: value }; }
-	/ plyCountKey ws value:integerString  { return { name: 'PlyCount', value: value }; }
-	/ variantKey ws value:string { return { name: 'Variant', value: value }; }
-	/ whiteRatingDiffKey ws value:string { return { name: 'WhiteRatingDiff', value: value }; }
-	/ blackRatingDiffKey ws value:string { return { name: 'BlackRatingDiff', value: value }; }
-	/ whiteFideIdKey ws value:string { return { name: 'WhiteFideId', value: value }; }
-	/ blackFideIdKey ws value:string { return { name: 'BlackFideId', value: value }; }
-	/ whiteTeamKey ws value:string { return { name: 'WhiteTeam', value: value }; }
-	/ blackTeamKey ws value:string { return { name: 'BlackTeam', value: value }; }
-	/ clockKey ws value:colorClockTimeQ { return { name: 'Clock', value: value }; }
-	/ whiteClockKey ws value:clockTimeQ { return { name: 'WhiteClock', value: value }; }
-	/ blackClockKey ws value:clockTimeQ { return { name: 'BlackClock', value: value }; }
-	/ & validatedKey a:anyKey ws value:string
-	      { addMessage( {key: a, value: value, message: `Format of tag: "${a}" not correct: "${value}"`} );
-	        return { name: a, value: value }; }
-	/ ! validatedKey a:anyKey ws value:string
-	    { addMessage( {key: a, value: value, message: `Tag: "${a}" not known: "${value}"`} );
-	      return { name: a, value: value }; }
-/*	/ ! validatedKey a:a ws value:string { console.log('Unknown Key: ' + a); return { name: a, value: value }; } */
+tagKeyValue = eventKey whitespaceOptional value:string { return { name: 'Event', value: value }; }
+	/ siteKey whitespaceOptional value:string  { return { name: 'Site', value: value }; }
+	/ dateKey whitespaceOptional value:dateString  { return { name: 'Date', value: value }; }
+	/ roundKey whitespaceOptional value:string  { return { name: 'Round', value: value }; }
+	/ whiteTitleKey whitespaceOptional value:string  { return { name: 'WhiteTitle', value: value }; }
+	/ blackTitleKey whitespaceOptional value:string  { return { name: 'BlackTitle', value: value }; }
+	/ whiteEloKey whitespaceOptional value:integerOrDashString  { return { name: 'WhiteElo', value: value }; }
+	/ blackEloKey whitespaceOptional value:integerOrDashString  { return { name: 'BlackElo', value: value }; }
+	/ whiteUSCFKey whitespaceOptional value:integerQuoted  { return { name: 'WhiteUSCF', value: value }; }
+	/ blackUSCFKey whitespaceOptional value:integerQuoted  { return { name: 'BlackUSCF', value: value }; }
+	/ whiteNAKey whitespaceOptional value:string  { return { name: 'WhiteNA', value: value }; }
+	/ blackNAKey whitespaceOptional value:string  { return { name: 'BlackNA', value: value }; }
+	/ whiteTypeKey whitespaceOptional value:string  { return { name: 'WhiteType', value: value }; }
+	/ blackTypeKey whitespaceOptional value:string  { return { name: 'BlackType', value: value }; }
+	/ whiteKey whitespaceOptional value:string  { return { name: 'White', value: value }; }
+	/ blackKey whitespaceOptional value:string  { return { name: 'Black', value: value }; }
+	/ resultKey whitespaceOptional value:resultQuoted  { return { name: 'Result', value: value }; }
+	/ eventDateKey whitespaceOptional value:dateString  { return { name: 'EventDate', value: value }; }
+	/ eventSponsorKey whitespaceOptional value:string  { return { name: 'EventSponsor', value: value }; }
+	/ sectionKey whitespaceOptional value:string  { return { name: 'Section', value: value }; }
+	/ stageKey whitespaceOptional value:string  { return { name: 'Stage', value: value }; }
+	/ boardKey whitespaceOptional value:integerQuoted  { return { name: 'Board', value: value }; }
+	/ openingKey whitespaceOptional value:string  { return { name: 'Opening', value: value }; }
+	/ variationKey whitespaceOptional value:string  { return { name: 'Variation', value: value }; }
+	/ subVariationKey whitespaceOptional value:string  { return { name: 'SubVariation', value: value }; }
+	/ ecoKey whitespaceOptional value:string  { return { name: 'ECO', value: value }; }
+	/ nicKey whitespaceOptional value:string  { return { name: 'NIC', value: value }; }
+	/ timeKey whitespaceOptional value:timeString  { return { name: 'Time', value: value }; }
+	/ utcTimeKey whitespaceOptional value:timeString  { return { name: 'UTCTime', value: value }; }
+	/ utcDateKey whitespaceOptional value:dateString  { return { name: 'UTCDate', value: value }; }
+	/ timeControlKey whitespaceOptional value:timeControlQuoted  { return { name: 'TimeControl', value: value }; }
+	/ setUpKey whitespaceOptional value:string  { return { name: 'SetUp', value: value }; }
+	/ fenKey whitespaceOptional value:string  { return { name: 'FEN', value: value }; }
+	/ terminationKey whitespaceOptional value:string  { return { name: 'Termination', value: value }; }
+	/ annotatorKey whitespaceOptional value:string  { return { name: 'Annotator', value: value }; }
+	/ modeKey whitespaceOptional value:string  { return { name: 'Mode', value: value }; }
+	/ plyCountKey whitespaceOptional value:integerQuoted  { return { name: 'PlyCount', value: value }; }
+	/ variantKey whitespaceOptional value:string { return { name: 'Variant', value: value }; }
+	/ whiteRatingDiffKey whitespaceOptional value:string { return { name: 'WhiteRatingDiff', value: value }; }
+	/ blackRatingDiffKey whitespaceOptional value:string { return { name: 'BlackRatingDiff', value: value }; }
+	/ whiteFideIdKey whitespaceOptional value:string { return { name: 'WhiteFideId', value: value }; }
+	/ blackFideIdKey whitespaceOptional value:string { return { name: 'BlackFideId', value: value }; }
+	/ whiteTeamKey whitespaceOptional value:string { return { name: 'WhiteTeam', value: value }; }
+	/ blackTeamKey whitespaceOptional value:string { return { name: 'BlackTeam', value: value }; }
+	/ clockKey whitespaceOptional value:colorClockTimeQuoted { return { name: 'Clock', value: value }; }
+	/ whiteClockKey whitespaceOptional value:clockTimeQuoted { return { name: 'WhiteClock', value: value }; }
+	/ blackClockKey whitespaceOptional value:clockTimeQuoted { return { name: 'BlackClock', value: value }; }
+	/ & validatedKey a:anyKey whitespaceOptional value:string
+        { 
+            addMessage( {key: a, value: value, message: `Format of tag: "${a}" not correct: "${value}"`} );
+	        return { name: a, value: value }; 
+        }
+	/ ! validatedKey a:anyKey whitespaceOptional value:string
+	    { 
+            addMessage( {key: a, value: value, message: `Tag: "${a}" not known: "${value}"`} );
+	        return { name: a, value: value }; 
+        }
 
 validatedKey  = dateKey / whiteEloKey / blackEloKey / whiteUSCFKey / blackUSCFKey / resultKey / eventDateKey / boardKey /
         timeKey / utcTimeKey / utcDateKey / timeControlKey / plyCountKey / clockKey / whiteClockKey / blackClockKey
@@ -180,20 +189,20 @@ blackTeamKey            =  'BlackTeam'
 clockKey                =  'Clock'
 whiteClockKey           =  'WhiteClock'
 blackClockKey           =  'BlackClock'
-anyKey                  =  stringNoQuot
+anyKey                  =  stringNoQuote
 
 
-ws "whitespace" = [ \t\n\r]*
-wsp = [ \t\n\r]+
-eol = [\n\r]+
+whitespaceOptional "whitespace" = [ \t\n\r]*
+whitespaceRequired "whitespace" = [ \t\n\r]+
+eol "end of line" = [\n\r]+
 
 esc_quotation
   = '\\"' { return  '\"'; }
 
-stringNoQuot
+stringNoQuote
   = chars:[-a-zA-Z0-9_.]* { return chars.join(""); }
 
-quotation_mark
+quotationMark
   = '"'
 
 string
@@ -214,38 +223,56 @@ _ "whitespace"
 Escape
   = "\\"
 
-dateString = quotation_mark year:([0-9\?] [0-9\?] [0-9\?] [0-9\?]) '.' month:([0-9\?] [0-9\?]) '.' day:([0-9\?] [0-9\?]) quotation_mark
-	{ let val = "" + year.join("") + '.' + month.join("") + '.' + day.join("");
-	    return { value: val, year: mi(year), month: mi(month), day: mi(day) }; }
+dateString = quotationMark year:([0-9\?] [0-9\?] [0-9\?] [0-9\?]) '.' month:([0-9\?] [0-9\?]) '.' day:([0-9\?] [0-9\?]) quotationMark
+	{ 
+        let val = "" + year.join("") + '.' + month.join("") + '.' + day.join("");
+	    return { value: val, year: mi(year), month: mi(month), day: mi(day) }; 
+    }
 
-timeString = quotation_mark hour:([0-9]+) ':' minute:([0-9]+) ':' second:([0-9]+) millis:millis? quotation_mark
-    { let val = hour.join("") + ':' + minute.join("") + ':' + second.join(""); let ms = 0;
-      if (millis) {
-         val = val + '.' + millis;
-         addMessage({ message: `Unusual use of millis in time: ${val}` });
-         mi(millis);
-      }
-      return { value: val, hour: mi(hour), minute: mi(minute), second: mi(second), millis: ms }; }
-millis = '.' millis:([0-9]+) { return millis.join(""); }
+timeString = quotationMark hour:([0-9]+) ':' minute:([0-9]+) ':' second:([0-9]+) millis:millis? quotationMark
+    { 
+        let val = hour.join("") + ':' + minute.join("") + ':' + second.join(""); 
+        let ms = 0;
+        if (millis) {
+            val = val + '.' + millis;
+            addMessage({ message: `Unusual use of millis in time: ${val}` });
+            ms = mi(millis);
+        }
+        return { value: val, hour: mi(hour), minute: mi(minute), second: mi(second), millis: ms }; 
+    }
 
-colorClockTimeQ = quotation_mark value:colorClockTime quotation_mark { return value; }
+millis = '.' millis:([0-9]+) 
+    { 
+        return millis.join(""); 
+    }
+
+colorClockTimeQuoted = quotationMark value:colorClockTime quotationMark { return value; }
 colorClockTime = c:clockColor '/' t:clockTime { return c + '/' + t; }
 clockColor = 'B' / 'W' / 'N'
 
-clockTimeQ = quotation_mark value:clockTime quotation_mark { return value; }
+clockTimeQuoted = quotationMark value:clockTime quotationMark { return value; }
 clockTime = value:clockValue1D { return value; }
 
-timeControl = quotation_mark res:tcnqs quotation_mark
-    { if (!res) { addMessage({ message: "Tag TimeControl has to have a value" }); return ""; }
-      return res; }
+timeControlQuoted = quotationMark res:timeControls quotationMark
+    { 
+        if (!res) { 
+            addMessage({ message: "Tag TimeControl has to have a value" }); 
+            return ""; 
+        }
+        return res; 
+    }
 
-tcnqs = tcnqs:(
-       head:tcnq
-         tail:(':' m:tcnq { return m; })*
-         { let ret = [head].concat(tail); ret.value = ret.map(ret => ret.value).join(':'); return ret; }
-       )? { return tcnqs; }
+timeControls = tcnqs:(
+    head:timeControl
+    tail:(':' m:timeControl { return m; })*
+    { 
+        let ret = [head].concat(tail); 
+        ret.value = ret.map(ret => ret.value).join(':');
+        return ret;
+    }
+)? { return tcnqs; }
 
-tcnq = '?' { return { kind: 'unknown', value: '?' }; }
+timeControl = '?' { return { kind: 'unknown', value: '?' }; }
     / '-' { return { kind: 'unlimited', value: '-' }; }
     / moves:integer "/" seconds:integer '+' incr:integer { return { kind: 'movesInSecondsIncrement', moves: moves, seconds: seconds, increment: incr, value: '' + moves + '/' + seconds + '+' + incr }; }
     / moves:integer "/" seconds:integer { return { kind: 'movesInSeconds', moves: moves, seconds: seconds, value: '' + moves + '/' + seconds }; }
@@ -253,83 +280,96 @@ tcnq = '?' { return { kind: 'unknown', value: '?' }; }
     / seconds:integer { return { kind: 'suddenDeath', seconds: seconds, value: '' + seconds }; }
     / '*' seconds:integer { return { kind: 'hourglass', seconds: seconds, value: '*' + seconds }; }
 
-result = quotation_mark res:innerResult quotation_mark { return res; }
-innerResult =
-	res:"1-0" {return res; }
-    / res:"0-1" { return res; }
-    / res:"1/2-1/2" { return res; }
-    / res:"*" { return res; }
+resultQuoted = quotationMark res:result quotationMark { return res; }
+result =
+	"1-0"
+    / "0-1"
+    / "1/2-1/2"
+    / "*"
 
 integerOrDashString =
- 	v:integerString { return v }
-    / quotation_mark '-' quotation_mark {return 0 }
-    / quotation_mark quotation_mark { addMessage({ message: 'Use "-" for an unknown value'}); return 0 }
+ 	v:integerQuoted { return v }
+    / quotationMark '-' quotationMark { return 0 }
+    / quotationMark quotationMark { 
+        addMessage({ message: 'Use "-" for an unknown value'}); 
+        return 0
+    }
 
-integerString =
-	quotation_mark digits:[0-9]+ quotation_mark { return makeInteger(digits); }
+integerQuoted =
+	quotationMark digits:[0-9]+ quotationMark { return makeInteger(digits); }
 
 pgn
-  = BOM? ws cm:comments? ws mn:moveNumber? ws hm:halfMove  ws nag:nags?  dr:drawOffer? ws ca:comments? ws vari:variation? all:pgn?
-    { var arr = (all ? all : []);
-      var move = {}; move.moveNumber = mn; move.notation = hm;
-      if (ca) { move.commentAfter = ca.comment };
-      if (cm) { move.commentMove = cm.comment };
-      if (dr) { move.drawOffer = true };
-      move.variations = (vari ? vari : []); move.nag = (nag ? nag : null); arr.unshift(move); 
-      move.commentDiag = ca;
-      return arr; }
-  / ws e:endGame ws {return e; }
+  = BOM? whitespaceOptional cm:comments? whitespaceOptional mn:moveNumber? whitespaceOptional hm:halfMove whitespaceOptional nag:nags? dr:drawOffer? whitespaceOptional ca:comments? whitespaceOptional vari:variation? all:pgn?
+    { 
+        var arr = (all ? all : []);
+        var move = {}; 
+        move.moveNumber = mn; 
+        move.notation = hm;
+        if (ca) { move.commentAfter = ca.comment };
+        if (cm) { move.commentMove = cm.comment };
+        if (dr) { move.drawOffer = true };
+        move.variations = (vari ? vari : []); 
+        move.nag = (nag ? nag : null);
+        arr.unshift(move); 
+        move.commentDiag = ca;
+        return arr; 
+    }
+  / whitespaceOptional e:endGame whitespaceOptional { return e; }
 
 drawOffer
-  = pl '=' pr
+  = openParenthesis '=' closeParenthesis
 
 endGame
-  = eg:innerResult { return [eg]; }
+  = eg:result { return [eg]; }
 
 comments
-  = cf:comment cfl:(ws c:comment { return c })*
+  = cf:comment cfl:(whitespaceOptional c:comment { return c })*
   { return merge([cf].concat(cfl)) }
 
 comment
-  = cl cr { return; }
-  / cl cm:innerComment cr { return cm;}
+  = openBrace closeBrace { return; }
+  / openBrace cm:innerComment closeBrace { return cm;}
   / cm:commentEndOfLine { return { comment: cm}; }
 
 innerComment
-  = ws bl "%csl" wsp cf:colorFields? ws br ws tail:(ic:innerComment { return ic })*
-      { return merge([{ colorFields: cf }].concat(tail[0])) }
-  / ws bl "%cal" wsp ca:colorArrows? ws br ws tail:(ic:innerComment { return ic })*
-      { return merge([{ colorArrows: ca }].concat(tail[0])) }
-  / ws bl "%" cc:clockCommand1D wsp cv:clockValue1D ws br ws tail:(ic:innerComment { return ic })*
-      { var ret = {}; ret[cc]= cv; return merge([ret].concat(tail[0])) }
-  / ws bl "%" cc:clockCommand2D wsp cv:clockValue2D ws br ws tail:(ic:innerComment { return ic })*
-      { var ret = {}; ret[cc]= cv; return merge([ret].concat(tail[0])) }
-  / ws bl "%eval" wsp ev:stringNoQuot ws br ws tail:(ic:innerComment { return ic })*
-      { var ret = {};  ret["eval"]= parseFloat(ev); return merge([ret].concat(tail[0])) }
-  / ws bl "%" ac:stringNoQuot wsp val:nbr+ br ws tail:(ic:innerComment { return ic })*
-      { var ret = {}; ret[ac]= val.join(""); return merge([ret].concat(tail[0])) }
-  / c:nonCommand+ tail:(ws ic:innerComment { return ic })*
-      { if (tail.length > 0) { return merge([{ comment: trimEnd(c.join("")) }].concat(trimStart(tail[0]))) }
-        else { return { comment: c.join("") } } }
+    = whitespaceOptional openBracket "%csl" whitespaceRequired cf:colorFields? whitespaceOptional closeBracket whitespaceOptional tail:(ic:innerComment { return ic })*
+        { return merge([{ colorFields: cf }].concat(tail[0])) }
+    / whitespaceOptional openBracket "%cal" whitespaceRequired ca:colorArrows? whitespaceOptional closeBracket whitespaceOptional tail:(ic:innerComment { return ic })*
+        { return merge([{ colorArrows: ca }].concat(tail[0])) }
+    / whitespaceOptional openBracket "%" cc:clockCommand1D whitespaceRequired cv:clockValue1D whitespaceOptional closeBracket whitespaceOptional tail:(ic:innerComment { return ic })*
+        { var ret = {}; ret[cc]= cv; return merge([ret].concat(tail[0])) }
+    / whitespaceOptional openBracket "%" cc:clockCommand2D whitespaceRequired cv:clockValue2D whitespaceOptional closeBracket whitespaceOptional tail:(ic:innerComment { return ic })*
+        { var ret = {}; ret[cc]= cv; return merge([ret].concat(tail[0])) }
+    / whitespaceOptional openBracket "%eval" whitespaceRequired ev:stringNoQuote whitespaceOptional closeBracket whitespaceOptional tail:(ic:innerComment { return ic })*
+        { var ret = {};  ret["eval"]= parseFloat(ev); return merge([ret].concat(tail[0])) }
+    / whitespaceOptional openBracket "%" ac:stringNoQuote whitespaceRequired val:nbr+ closeBracket whitespaceOptional tail:(ic:innerComment { return ic })*
+        { var ret = {}; ret[ac]= val.join(""); return merge([ret].concat(tail[0])) }
+    / c:nonCommand+ tail:(whitespaceOptional ic:innerComment { return ic })*
+        { 
+            if (tail.length > 0) { 
+                return merge([{ comment: trimEnd(c.join("")) }].concat(trimStart(tail[0]))) 
+            }
+            return { comment: c.join("").trim() } 
+        }
 
 nonCommand
   = !"[%" !"}" ch:. { return ch; }
 
 nbr
-  = !br ch:. { return ch; }
+  = !closeBracket ch:. { return ch; }
 
 commentEndOfLine
   = semicolon cm:[^\n\r]* eol { return cm.join(""); }
 
 colorFields
-  = cf:colorField ws cfl:("," ws colorField)*
+  = cf:colorField whitespaceOptional cfl:("," whitespaceOptional colorField)*
   { var arr = []; arr.push(cf); for (var i=0; i < cfl.length; i++) { arr.push(cfl[i][2])}; return arr; }
 
 colorField
   = col:color f:field { return col + f; }
 
 colorArrows
-  = cf:colorArrow ws cfl:("," ws colorArrow)*
+  = cf:colorArrow whitespaceOptional cfl:("," whitespaceOptional colorArrow)*
   { var arr = []; arr.push(cf); for (var i=0; i < cfl.length; i++) { arr.push(cfl[i][2])}; return arr; }
 
 colorArrow
@@ -346,13 +386,13 @@ color
 field
   = col:column row:row { return col + row; }
 
-cl = '{'
+openBrace = '{'
 
-cr = '}'
+closeBrace = '}'
 
-bl = '['
+openBracket = '['
 
-br = ']'
+closeBracket = ']'
 
 semicolon = ';'
 
@@ -416,27 +456,27 @@ digit
   = d:[0-9] { return d; }
 
 variation
-  = pl vari:pgn pr ws all:variation?
+  = openParenthesis vari:pgn closeParenthesis whitespaceOptional all:variation?
     { var arr = (all ? all : []); arr.unshift(vari); return arr; }
 
-pl = '('
+openParenthesis = '('
 
-pr = ')'
+closeParenthesis = ')'
 
 moveNumber
-    = num:integer whiteSpace* dot* { return num; }
+    = num:integer space* dot* { return num; }
 
 dot = "."
 
 integer "integer"
     = digits:[0-9]+ { return makeInteger(digits); }
 
-whiteSpace
-    = " "+ { return '';}
+space
+    = " "+ { return ''; }
 
 halfMove
   = fig:figure? & checkdisc disc:discriminator str:strike?
-    col:column row:row pr:promotion? ch:check? ws 'e.p.'?
+    col:column row:row pr:promotion? ch:check? whitespaceOptional 'e.p.'?
     { var hm = {}; hm.fig = (fig ? fig : null); hm.disc =  (disc ? disc : null); hm.strike = (str ? str : null);
     hm.col = col; hm.row = row; hm.check = (ch ? ch : null); hm.promotion = pr;
     hm.notation = (fig ? fig : "") + (disc ? disc : "") + (str ? str : "") + col + row + (pr ? pr : "") + (ch ? ch : "");
@@ -462,7 +502,7 @@ promotion
   = '='? f:promFigure { return '=' + f; }
 
 nags
-  = nag:nag ws nags:nags? { var arr = (nags ? nags : []); arr.unshift(nag); return arr; }
+  = nag:nag whitespaceOptional nags:nags? { var arr = (nags ? nags : []); arr.unshift(nag); return arr; }
 
 nag
   = '$' num:integer { return '$' + num; }
