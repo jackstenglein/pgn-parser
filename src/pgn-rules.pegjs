@@ -283,8 +283,12 @@ timeControl = '?' { return { kind: 'unknown', value: '?' }; }
 resultQuoted = quotationMark res:result quotationMark { return res; }
 result =
 	"1-0"
+    / "1 - 0" { return "1-0" }
     / "0-1"
+    / "0 - 1" { return "0-1" }
     / "1/2-1/2"
+    / "1/2 - 1/2" { return "1/2-1/2" }
+    / "1/2" { return "1/2-1/2" }
     / "*"
 
 integerOrDashString =
@@ -464,7 +468,7 @@ openParenthesis = '('
 closeParenthesis = ')'
 
 moveNumber
-    = num:integer space* dot* { return num; }
+    = num:integer space* dot* space* dot* { return num; }
 
 dot = "."
 
@@ -493,6 +497,8 @@ halfMove
   / 'O-O' ch:check? { var hm = {}; hm.notation = 'O-O'+ (ch ? ch : ""); hm.check = (ch ? ch : null); return  hm; }
   / fig:figure '@' col:column row:row
     { var hm = {}; hm.fig = fig; hm.drop = true; hm.col = col; hm.row = row; hm.notation = fig + '@' + col + row; return hm; }
+  / "Z0"
+     { var hm = {}; hm.notation = "Z0"; return hm; }
 
 check
   = ch:(! '+-' '+') { return ch[1]; }
