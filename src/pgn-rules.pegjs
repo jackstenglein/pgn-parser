@@ -58,7 +58,7 @@ game = BOM? tags:tags? gameComment:comments? moves:pgn
     {
         var mess = messages; 
         messages = [];
-        return { tags, gameComment, moves, messages: mess }; 
+        return { tags: tags.tags, gameComment, moves, messages: mess }; 
     }
 
 tags = BOM? whitespaceOptional members:(
@@ -73,9 +73,7 @@ tags = BOM? whitespaceOptional members:(
       }
     )? whitespaceOptional
     { 
-        if (members === null) return {};
-        members.messages = messages; 
-        return members;
+        return { tags: members || {}, messages };
     }
 
 
@@ -87,10 +85,10 @@ tagKeyValue = eventKey whitespaceOptional value:string { return { name: 'Event',
 	/ roundKey whitespaceOptional value:string  { return { name: 'Round', value: value }; }
 	/ whiteTitleKey whitespaceOptional value:string  { return { name: 'WhiteTitle', value: value }; }
 	/ blackTitleKey whitespaceOptional value:string  { return { name: 'BlackTitle', value: value }; }
-	/ whiteEloKey whitespaceOptional value:integerOrDashString  { return { name: 'WhiteElo', value: value }; }
-	/ blackEloKey whitespaceOptional value:integerOrDashString  { return { name: 'BlackElo', value: value }; }
-	/ whiteUSCFKey whitespaceOptional value:integerQuoted  { return { name: 'WhiteUSCF', value: value }; }
-	/ blackUSCFKey whitespaceOptional value:integerQuoted  { return { name: 'BlackUSCF', value: value }; }
+	/ whiteEloKey whitespaceOptional value:eloTagValue  { return { name: 'WhiteElo', value: value }; }
+	/ blackEloKey whitespaceOptional value:eloTagValue  { return { name: 'BlackElo', value: value }; }
+	/ whiteUSCFKey whitespaceOptional value:eloTagValue  { return { name: 'WhiteUSCF', value: value }; }
+	/ blackUSCFKey whitespaceOptional value:eloTagValue  { return { name: 'BlackUSCF', value: value }; }
 	/ whiteNAKey whitespaceOptional value:string  { return { name: 'WhiteNA', value: value }; }
 	/ blackNAKey whitespaceOptional value:string  { return { name: 'BlackNA', value: value }; }
 	/ whiteTypeKey whitespaceOptional value:string  { return { name: 'WhiteType', value: value }; }
@@ -274,11 +272,11 @@ timeControls = tcnqs:(
 
 timeControl = '?' { return { kind: 'unknown', value: '?' }; }
     / '-' { return { kind: 'unlimited', value: '-' }; }
-    / moves:integer "/" seconds:integer '+' incr:integer { return { kind: 'movesInSecondsIncrement', moves: moves, seconds: seconds, increment: incr, value: '' + moves + '/' + seconds + '+' + incr }; }
-    / moves:integer "/" seconds:integer { return { kind: 'movesInSeconds', moves: moves, seconds: seconds, value: '' + moves + '/' + seconds }; }
-    / seconds:integer '+' incr:integer { return { kind: 'increment', seconds: seconds, increment: incr, value: '' + seconds + '+' + incr }; }
-    / seconds:integer { return { kind: 'suddenDeath', seconds: seconds, value: '' + seconds }; }
-    / '*' seconds:integer { return { kind: 'hourglass', seconds: seconds, value: '*' + seconds }; }
+    / moves:integer "/" seconds:integer '+' incr:integer { return { kind: 'movesInSecondsIncrement', moves: moves, seconds: seconds, increment: incr, value: `${moves}/${seconds}+${incr}` }; }
+    / moves:integer "/" seconds:integer { return { kind: 'movesInSeconds', moves: moves, seconds: seconds, value: `${moves}/${seconds}` }; }
+    / seconds:integer '+' incr:integer { return { kind: 'increment', seconds: seconds, increment: incr, value: `${seconds}+${incr}` }; }
+    / seconds:integer { return { kind: 'suddenDeath', seconds: seconds, value: `${seconds}` }; }
+    / '*' seconds:integer { return { kind: 'hourglass', seconds: seconds, value: `*${seconds}` }; }
 
 resultQuoted = quotationMark res:result quotationMark { return res; }
 result =
@@ -291,31 +289,31 @@ result =
     / "1/2" { return "1/2-1/2" }
     / "*"
 
-integerOrDashString =
- 	v:integerQuoted { return v }
-    / quotationMark '-' quotationMark { return 0 }
-    / quotationMark quotationMark { 
-        addMessage({ message: 'Use "-" for an unknown value'}); 
-        return 0
-    }
+eloTagValue = 
+  v:integerQuoted { return { value: `${v}`, int: v }}
+  / quotationMark '-' quotationMark { return { value: '-' }}
+  / quotationMark quotationMark { return { value: '-' }}
+  / value:string { return { value, int: parseInt(value) }}
 
 integerQuoted =
 	quotationMark digits:[0-9]+ quotationMark { return makeInteger(digits); }
 
 pgn
-  = BOM? whitespaceOptional cm:comments? whitespaceOptional mn:moveNumber? whitespaceOptional hm:halfMove whitespaceOptional nag:nags? dr:drawOffer? whitespaceOptional ca:comments? whitespaceOptional vari:variation? all:pgn?
+  = BOM? whitespaceOptional cm:comments? whitespaceOptional mn:moveNumber? whitespaceOptional hm:halfMove whitespaceOptional nags:nags? dr:drawOffer? whitespaceOptional ca:comments? whitespaceOptional vari:variation? all:pgn?
     { 
         var arr = (all ? all : []);
         var move = {}; 
         move.moveNumber = mn; 
         move.notation = hm;
-        if (ca) { move.commentAfter = ca.comment };
+        if (ca) { 
+          move.commentDiag = ca;
+          move.commentAfter = ca.comment;
+        };
         if (cm) { move.commentMove = cm.comment };
         if (dr) { move.drawOffer = true };
         move.variations = (vari ? vari : []); 
-        move.nag = (nag ? nag : null);
+        move.nags = (nags ? nags : undefined);
         arr.unshift(move); 
-        move.commentDiag = ca;
         return arr; 
     }
   / whitespaceOptional e:endGame whitespaceOptional { return e; }
@@ -479,26 +477,70 @@ space
     = " "+ { return ''; }
 
 halfMove
-  = fig:figure? & checkdisc disc:discriminator str:strike?
+  = fig:figure? & checkdisc disc:discriminator strike:strike?
     col:column row:row pr:promotion? ch:check? whitespaceOptional 'e.p.'?
-    { var hm = {}; hm.fig = (fig ? fig : null); hm.disc =  (disc ? disc : null); hm.strike = (str ? str : null);
-    hm.col = col; hm.row = row; hm.check = (ch ? ch : null); hm.promotion = pr;
-    hm.notation = (fig ? fig : "") + (disc ? disc : "") + (str ? str : "") + col + row + (pr ? pr : "") + (ch ? ch : "");
-    return hm; }
-  / fig:figure? cols:column rows:row str:strikeOrDash? col:column row:row pr:promotion? ch:check?
-    { var hm = {}; hm.fig = (fig ? fig : null); hm.strike = (str =='x' ? str : null); hm.col = col; hm.row = row;
-    hm.notation = (fig && (fig!=='P') ? fig : "") + cols + rows + (str=='x' ? str : "-") + col  + row + (pr ? pr : "") + (ch ? ch : "");
-    hm.check = (ch ? ch : null); hm.promotion = pr; return hm; }
-  / fig:figure? str:strike? col:column row:row pr:promotion? ch:check?
-    { var hm = {}; hm.fig = (fig ? fig : null); hm.strike = (str ? str : null); hm.col = col;
-    hm.row = row; hm.check = (ch ? ch : null); hm.promotion = pr;
-    hm.notation = (fig ? fig : "") + (str ? str : "") + col  + row + (pr ? pr : "") + (ch ? ch : ""); return hm; }
-  / 'O-O-O' ch:check? { var hm = {}; hm.notation = 'O-O-O'+ (ch ? ch : ""); hm.check = (ch ? ch : null); return  hm; }
-  / 'O-O' ch:check? { var hm = {}; hm.notation = 'O-O'+ (ch ? ch : ""); hm.check = (ch ? ch : null); return  hm; }
+    { 
+      return {
+        piece: fig || undefined,
+        discriminator: disc,
+        strike: strike || undefined,
+        file: col,
+        rank: row,
+        check: ch || undefined,
+        promotion: pr || undefined,
+        notation: (fig ? fig : "") + (disc ? disc : "") + (strike ? strike : "") + col + row + (pr ? pr : "") + (ch ? ch : "")
+      };
+    }
+  / fig:figure? cols:column rows:row strike:strikeOrDash? col:column row:row pr:promotion? ch:check?
+    { 
+      return {
+        piece: fig || undefined,
+        strike: strike === 'x' ? strike : undefined,
+        file: col,
+        rank: row,
+        notation: (fig && fig !== 'P' ? fig : "") + cols + rows + (strike === 'x' ? strike : "-") + col + row + (pr ? pr : "") + (ch ? ch : ""),
+        check: ch || undefined,
+        promotion: pr || undefined,
+      };
+    }
+  / fig:figure? strike:strike? col:column row:row pr:promotion? ch:check?
+    { 
+      return {
+        piece: fig || undefined,
+        strike: strike || undefined,
+        file: col,
+        rank: row,
+        check: ch || undefined,
+        promotion: pr || undefined,
+        notation: (fig ? fig : "") + (strike ? strike : "") + col  + row + (pr ? pr : "") + (ch ? ch : "")
+      }; 
+    }
+  / 'O-O-O' ch:check?
+    { 
+      return {
+        notation: 'O-O-O' + (ch ? ch : ""),
+        check: ch || undefined,
+      };
+    }
+  / 'O-O' ch:check? 
+    { 
+      return {
+        notation: 'O-O' + (ch ? ch : ""),
+        check: ch || undefined,
+      };
+    }
   / fig:figure '@' col:column row:row
-    { var hm = {}; hm.fig = fig; hm.drop = true; hm.col = col; hm.row = row; hm.notation = fig + '@' + col + row; return hm; }
+    { 
+      return {
+        piece: fig,
+        file: col,
+        rank: row,
+        notation: fig + '@' + col + row,
+        drop: true,
+      };
+    }
   / "Z0"
-     { var hm = {}; hm.notation = "Z0"; return hm; }
+     { return { notation: 'Z0' }; }
 
 check
   = ch:(! '+-' '+') { return ch[1]; }
