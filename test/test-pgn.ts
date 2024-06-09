@@ -354,32 +354,32 @@ gameWithComments('should understand one clock annotation per move', () => {
     // [ clk|egt|emt|mct  00:01:17 ]
     const res = parsePgn('c4 {[%clk 2:10:30]} Nf6 {[%egt 2:10:31]}');
     assert.ok(res[0].commentDiag);
-    assert.is(res[0].commentDiag['clk'], '2:10:30');
-    assert.is(res[1].commentDiag?.['egt'], '2:10:31');
+    assert.is(res[0].commentDiag.clk, '2:10:30');
+    assert.is(res[1].commentDiag?.egt, '2:10:31');
 });
 // Not allowed due to the spec
 // gameWithComments("should understand clock annotations without whitespace", () => {
 xtest('should understand clock annotations without whitespace', () => {
     const res = parsePgn('c4 {[%clk2:10:30]} Nf6 {[%egt2:10:31]}');
     assert.ok(res[0].commentDiag);
-    assert.is(res[0].commentDiag['clk'], '2:10:30');
-    assert.is(res[1].commentDiag?.['egt'], '2:10:31');
+    assert.is(res[0].commentDiag.clk, '2:10:30');
+    assert.is(res[1].commentDiag?.egt, '2:10:31');
 });
 gameWithComments('should understand many clock annotations in one move only', () => {
     const res = parsePgn(
         'c4 {[%clk 0:10:10] [%egt 0:10:10] [%emt 0:08:08] [%mct 1:10:11]}'
     );
     assert.ok(res[0].commentDiag);
-    assert.is(res[0].commentDiag['clk'], '0:10:10');
-    assert.is(res[0].commentDiag['egt'], '0:10:10');
-    assert.is(res[0].commentDiag['emt'], '0:08:08');
-    assert.is(res[0].commentDiag['mct'], '1:10:11');
+    assert.is(res[0].commentDiag.clk, '0:10:10');
+    assert.is(res[0].commentDiag.egt, '0:10:10');
+    assert.is(res[0].commentDiag.emt, '0:08:08');
+    assert.is(res[0].commentDiag.mct, '1:10:11');
 });
 gameWithComments('should understand mix of clock comments and normal comments', () => {
     const res = parsePgn('c4 {Start [%clk 0:10:10] comment [%egt 0:10:10] up to end}');
     assert.ok(res[0].commentDiag);
-    assert.is(res[0].commentDiag['clk'], '0:10:10');
-    assert.is(res[0].commentDiag['egt'], '0:10:10');
+    assert.is(res[0].commentDiag.clk, '0:10:10');
+    assert.is(res[0].commentDiag.egt, '0:10:10');
     assert.is(res[0].commentAfter, 'Start comment up to end');
 });
 gameWithComments(
@@ -387,7 +387,7 @@ gameWithComments(
     () => {
         const res = parsePgn('1. e4 { First move } { [%cal Gd2d4] } { [%clk 0:02:00] }');
         assert.ok(res[0].commentDiag);
-        assert.is(res[0].commentDiag['clk'], '0:02:00');
+        assert.is(res[0].commentDiag.clk, '0:02:00');
         let arrows = res[0].commentDiag?.colorArrows || [];
         assert.is(arrows[0], 'Gd2d4');
         assert.is(res[0].commentAfter, 'First move');
@@ -432,22 +432,22 @@ does this work?? } c6`;
 gameWithComments('should keep commands it cannot parse inside comments', () => {
     const res = parsePgn('1. e4 { [%foo 1.0] [%bar any,string] }');
     assert.is(res.length, 1);
-    let commentDiag = <object>res[0].commentDiag;
-    assert.is(commentDiag['foo'], '1.0');
-    assert.is(commentDiag['bar'], 'any,string');
+    const commentDiag = res[0].commentDiag;
+    assert.is(commentDiag?.foo, '1.0');
+    assert.is(commentDiag?.bar, 'any,string');
 });
 gameWithComments('should keep commands sprinkled in comments it cannot parse', () => {
     const res = parsePgn('1. e4 { [%foo 1.0] } { [%bar any,string] }');
     assert.is(res.length, 1);
-    let commentDiag = <object>res[0].commentDiag;
-    assert.is(commentDiag['foo'], '1.0');
-    assert.is(commentDiag['bar'], 'any,string');
+    const commentDiag = res[0].commentDiag;
+    assert.is(commentDiag?.foo, '1.0');
+    assert.is(commentDiag?.bar, 'any,string');
 });
 gameWithComments('should keep commands it cannot parse, read diag comments', () => {
     const res = parsePgn('1. e4 { [%foo 1.0] } { [%clk 0:02:00] }');
     assert.is(res.length, 1);
-    let commentDiag = <object>res[0].commentDiag;
-    assert.is(commentDiag['foo'], '1.0');
+    const commentDiag = res[0].commentDiag;
+    assert.is(commentDiag?.foo, '1.0');
     assert.is(res[0].commentDiag?.clk, '0:02:00');
 });
 gameWithComments(
@@ -457,9 +457,9 @@ gameWithComments(
             '1. e4 { first comment [%foo 1.0] second comment [%bar any,string] }'
         );
         assert.is(res.length, 1);
-        let commentDiag = <object>res[0].commentDiag;
-        assert.is(commentDiag['foo'], '1.0');
-        assert.is(commentDiag['bar'], 'any,string');
+        const commentDiag = res[0].commentDiag;
+        assert.is(commentDiag?.foo, '1.0');
+        assert.is(commentDiag?.bar, 'any,string');
         assert.is(res[0].commentAfter, ' first comment second comment');
     }
 );
@@ -489,8 +489,8 @@ gameWithComments('should read unknown action comments', () => {
         '1. d4 {[%depth20 +0.35] [%depth1 +0.34]} Nf6 {[%depth20 +0.24] [%depth1 +0.13]}'
     );
     assert.ok(res);
-    assert.is(res[0].commentDiag?.['depth20'], '+0.35');
-    assert.is(res[1].commentDiag?.['depth1'], '+0.13');
+    assert.is(res[0].commentDiag?.depth20, '+0.35');
+    assert.is(res[1].commentDiag?.depth1, '+0.13');
 });
 gameWithComments('should read action comment with underscore (#362)', () => {
     const res = parsePgn(
@@ -498,7 +498,7 @@ gameWithComments('should read action comment with underscore (#362)', () => {
     );
     assert.ok(res);
     assert.is(
-        res[5].commentDiag?.['c_effect'],
+        res[5].commentDiag?.c_effect,
         'f6;square;f6;type;Inaccuracy;persistent;true'
     );
 });
@@ -515,21 +515,21 @@ const clockCommands = suite('Parsing PGN with clockCommands with unusual format'
 clockCommands('should emmit messages for mct with 1 hour digit', () => {
     const res = parseGame('e5 { [%mct 1:10:42] }');
     assert.ok(res);
-    assert.is(res.moves[0].commentDiag?.['mct'], '1:10:42');
+    assert.is(res.moves[0].commentDiag?.mct, '1:10:42');
     assert.is(res.messages[0].message, 'Only 2 digits for hours normally used');
 });
 clockCommands('should emmit messages for egt, emt, clk with 2 hour digit', () => {
     let res = parseGame('e5 { [%egt 01:10:42] }');
     assert.ok(res);
-    assert.is(res.moves[0].commentDiag?.['egt'], '01:10:42');
+    assert.is(res.moves[0].commentDiag?.egt, '01:10:42');
     assert.is(res.messages[0].message, 'Only 1 digit for hours normally used');
     res = parseGame('e5 { [%emt 01:10:42] }');
     assert.ok(res);
-    assert.is(res.moves[0].commentDiag?.['emt'], '01:10:42');
+    assert.is(res.moves[0].commentDiag?.emt, '01:10:42');
     assert.is(res.messages[0].message, 'Only 1 digit for hours normally used');
     res = parseGame('e5 { [%clk 01:10:42] }');
     assert.ok(res);
-    assert.is(res.moves[0].commentDiag?.['clk'], '01:10:42');
+    assert.is(res.moves[0].commentDiag?.clk, '01:10:42');
     assert.is(res.messages[0].message, 'Only 1 digit for hours normally used');
 });
 clockCommands(
@@ -537,7 +537,7 @@ clockCommands(
     () => {
         const res = parseGame('e5 { [%emt 42] }');
         assert.ok(res);
-        assert.is(res.moves[0].commentDiag?.['emt'], '42');
+        assert.is(res.moves[0].commentDiag?.emt, '42');
         assert.is(res.messages[0].message, 'Hours and minutes missing');
     }
 );
@@ -546,7 +546,7 @@ clockCommands(
     () => {
         const res = parseGame('e5 { [%emt 12:42] }');
         assert.ok(res);
-        assert.is(res.moves[0].commentDiag?.['emt'], '12:42');
+        assert.is(res.moves[0].commentDiag?.emt, '12:42');
         assert.is(res.messages[0].message, 'No hours found');
     }
 );
@@ -555,14 +555,14 @@ clockCommands(
     () => {
         const res = parseGame('e5 { [%emt 2:42] }');
         assert.ok(res);
-        assert.is(res.moves[0].commentDiag?.['emt'], '2:42');
+        assert.is(res.moves[0].commentDiag?.emt, '2:42');
         assert.is(res.messages[0].message, 'No hours found');
     }
 );
 clockCommands('should emmit a message for use of millis', () => {
     const res = parseGame('e5 {[%clk 0:00:59.8]}');
     assert.ok(res);
-    assert.is(res.moves[0].commentDiag?.['clk'], '0:00:59.8');
+    assert.is(res.moves[0].commentDiag?.clk, '0:00:59.8');
     assert.is(res.messages[0].message, 'Unusual use of millis in clock value');
 });
 clockCommands.run();

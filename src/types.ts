@@ -185,6 +185,11 @@ export type TagKeys = keyof Tags;
 /** The player with the move. */
 export type Turn = 'w' | 'b';
 
+/** The type of custom commands left on a PGN move (Ex: %depth1). */
+export type CustomCommands = {
+    [key: string]: string;
+};
+
 /** A comment with arrows, highlights and other commands. */
 export type DiagramComment = {
     /** The text portion of the comment. Only present for game comments. */
@@ -210,7 +215,7 @@ export type DiagramComment = {
 
     /** The value of the %eval command. */
     eval?: string;
-};
+} & CustomCommands;
 
 /** A single move in the PGN */
 export type PgnMove = {
