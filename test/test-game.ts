@@ -1,17 +1,20 @@
 import { suite } from 'uvu';
 import assert from 'uvu/assert';
-import { parseGame, parseGames, ParseTree } from '../src';
-import { TagKeys } from '@mliebelt/pgn-types';
+import { parseGame, ParseTree } from '../src';
 
-let tag = function (pt: ParseTree, tag: TagKeys): string {
+export function tag(pt: ParseTree, tag: string): string {
     if (!pt.tags) {
         return '';
     }
     if (pt.tags && pt.tags[tag]) {
-        return pt.tags[tag];
+        const t = pt.tags[tag];
+        if (typeof t === 'string') {
+            return t;
+        }
+        return t.value || '';
     }
     return '';
-};
+}
 
 // The following test cases test everything about a game, with the exception of game moves, and tags.
 const workingWithOneGame = suite('When working with one game');

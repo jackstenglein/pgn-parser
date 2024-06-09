@@ -58,7 +58,7 @@ game = BOM? tags:tags? gameComment:comments? moves:pgn
     {
         var mess = messages; 
         messages = [];
-        return { tags, gameComment, moves, messages: mess }; 
+        return { tags: tags.tags, gameComment, moves, messages: mess }; 
     }
 
 tags = BOM? whitespaceOptional members:(
@@ -73,9 +73,7 @@ tags = BOM? whitespaceOptional members:(
       }
     )? whitespaceOptional
     { 
-        if (members === null) return {};
-        members.messages = messages; 
-        return members;
+        return { tags: members || {}, messages };
     }
 
 
@@ -87,10 +85,10 @@ tagKeyValue = eventKey whitespaceOptional value:string { return { name: 'Event',
 	/ roundKey whitespaceOptional value:string  { return { name: 'Round', value: value }; }
 	/ whiteTitleKey whitespaceOptional value:string  { return { name: 'WhiteTitle', value: value }; }
 	/ blackTitleKey whitespaceOptional value:string  { return { name: 'BlackTitle', value: value }; }
-	/ whiteEloKey whitespaceOptional value:integerOrDashString  { return { name: 'WhiteElo', value: value }; }
-	/ blackEloKey whitespaceOptional value:integerOrDashString  { return { name: 'BlackElo', value: value }; }
-	/ whiteUSCFKey whitespaceOptional value:integerQuoted  { return { name: 'WhiteUSCF', value: value }; }
-	/ blackUSCFKey whitespaceOptional value:integerQuoted  { return { name: 'BlackUSCF', value: value }; }
+	/ whiteEloKey whitespaceOptional value:eloTagValue  { return { name: 'WhiteElo', value: value }; }
+	/ blackEloKey whitespaceOptional value:eloTagValue  { return { name: 'BlackElo', value: value }; }
+	/ whiteUSCFKey whitespaceOptional value:eloTagValue  { return { name: 'WhiteUSCF', value: value }; }
+	/ blackUSCFKey whitespaceOptional value:eloTagValue  { return { name: 'BlackUSCF', value: value }; }
 	/ whiteNAKey whitespaceOptional value:string  { return { name: 'WhiteNA', value: value }; }
 	/ blackNAKey whitespaceOptional value:string  { return { name: 'BlackNA', value: value }; }
 	/ whiteTypeKey whitespaceOptional value:string  { return { name: 'WhiteType', value: value }; }
@@ -274,11 +272,11 @@ timeControls = tcnqs:(
 
 timeControl = '?' { return { kind: 'unknown', value: '?' }; }
     / '-' { return { kind: 'unlimited', value: '-' }; }
-    / moves:integer "/" seconds:integer '+' incr:integer { return { kind: 'movesInSecondsIncrement', moves: moves, seconds: seconds, increment: incr, value: '' + moves + '/' + seconds + '+' + incr }; }
-    / moves:integer "/" seconds:integer { return { kind: 'movesInSeconds', moves: moves, seconds: seconds, value: '' + moves + '/' + seconds }; }
-    / seconds:integer '+' incr:integer { return { kind: 'increment', seconds: seconds, increment: incr, value: '' + seconds + '+' + incr }; }
-    / seconds:integer { return { kind: 'suddenDeath', seconds: seconds, value: '' + seconds }; }
-    / '*' seconds:integer { return { kind: 'hourglass', seconds: seconds, value: '*' + seconds }; }
+    / moves:integer "/" seconds:integer '+' incr:integer { return { kind: 'movesInSecondsIncrement', moves: moves, seconds: seconds, increment: incr, value: `${moves}/${seconds}+${incr}` }; }
+    / moves:integer "/" seconds:integer { return { kind: 'movesInSeconds', moves: moves, seconds: seconds, value: `${moves}/${seconds}` }; }
+    / seconds:integer '+' incr:integer { return { kind: 'increment', seconds: seconds, increment: incr, value: `${seconds}+${incr}` }; }
+    / seconds:integer { return { kind: 'suddenDeath', seconds: seconds, value: `${seconds}` }; }
+    / '*' seconds:integer { return { kind: 'hourglass', seconds: seconds, value: `*${seconds}` }; }
 
 resultQuoted = quotationMark res:result quotationMark { return res; }
 result =
@@ -291,13 +289,11 @@ result =
     / "1/2" { return "1/2-1/2" }
     / "*"
 
-integerOrDashString =
- 	v:integerQuoted { return v }
-    / quotationMark '-' quotationMark { return 0 }
-    / quotationMark quotationMark { 
-        addMessage({ message: 'Use "-" for an unknown value'}); 
-        return 0
-    }
+eloTagValue = 
+  v:integerQuoted { return { value: `${v}`, int: v }}
+  / quotationMark '-' quotationMark { return { value: '-' }}
+  / quotationMark quotationMark { return { value: '-' }}
+  / value:string { return { value, int: parseInt(value) }}
 
 integerQuoted =
 	quotationMark digits:[0-9]+ quotationMark { return makeInteger(digits); }

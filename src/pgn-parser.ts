@@ -1,6 +1,12 @@
 import PegParser from './_pgn-parser.js';
-import { ParseTree, PgnOptions, Turn, Tags } from './types';
-import { PgnMove } from '@mliebelt/pgn-types';
+import {
+    ParseTree,
+    PgnOptions,
+    Turn,
+    PgnMove,
+    StartRule,
+    ParseResponseType,
+} from './types';
 
 /**
  * General parse function, that accepts all `startRule`s. Calls then the more specific ones, so that the
@@ -9,26 +15,26 @@ import { PgnMove } from '@mliebelt/pgn-types';
  * @param options - the parameters that have to include the `startRule`
  * @returns a ParseTree or an array of ParseTrees, depending on the startRule
  */
-export function parse(
+export function parse<SR extends StartRule>(
     input: string,
-    options: PgnOptions
-): ParseTree | ParseTree[] | PgnMove[] | Tags {
+    options?: PgnOptions<SR>
+): ParseResponseType<SR> {
     if (!options || options.startRule === 'games') {
-        return parseGames(input, options);
+        return parseGames(input, options) as ParseResponseType<SR>;
     } else {
-        return parseGame(input, options);
+        return parseGame(input, options) as ParseResponseType<SR>;
     }
 }
 
 /**
  * Special parse function to parse one game only, options may be omitted.
  * @param input - the PGN string that will be parsed
- * @param options - object with additional parameters (not used at the moment)
+ * @param options - object with additional parameters
  * @returns a ParseTree with the defined structure
  */
-export function parseGame(
+export function parseGame<SR extends StartRule>(
     input: string,
-    options: PgnOptions = { startRule: 'game' }
+    options: PgnOptions<SR> = { startRule: 'game' as SR }
 ): ParseTree {
     input = input.trim();
     // Ensure that the correct structure exists: { tags: xxx, moves: ... }
@@ -37,17 +43,18 @@ export function parseGame(
     if (options.startRule === 'pgn') {
         res2.moves = result;
     } else if (options.startRule === 'tags') {
-        res2.tags = result;
+        res2.tags = result.tags;
+        res2.messages = result.messages;
     } else {
         res2 = result;
     }
     return postParseGame(res2, input, options);
 }
 
-function postParseGame(
+function postParseGame<SR extends StartRule>(
     _parseTree: ParseTree,
     _input: string,
-    _options: { startRule: string } & PgnOptions
+    _options: { startRule: SR } & PgnOptions<SR>
 ) {
     /** Ensure that the result is kept as tag only, so no check of last move is necessary any more. */
     function handleGameResult(parseTree: ParseTree) {
@@ -117,9 +124,9 @@ function postParseGame(
  * @param options the optional parameters (not used at the moment)
  * @returns an array of ParseTrees, one for each game included
  */
-export function parseGames(
+export function parseGames<SR extends StartRule>(
     input: string,
-    options: PgnOptions = { startRule: 'games' }
+    options: PgnOptions<SR> = { startRule: 'games' as SR }
 ): ParseTree[] {
     function handleGamesAnomaly(parseTree: ParseTree[]): ParseTree[] {
         if (!Array.isArray(parseTree)) return [];
@@ -134,7 +141,7 @@ export function parseGames(
     function postParseGames(
         parseTrees: ParseTree[],
         _input: string,
-        _options: PgnOptions = { startRule: 'games' }
+        _options: PgnOptions<SR> = { startRule: 'games' as SR }
     ) {
         return handleGamesAnomaly(parseTrees);
     }

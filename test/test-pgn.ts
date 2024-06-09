@@ -1,23 +1,12 @@
 import { suite } from 'uvu';
 import assert from 'uvu/assert';
-import { parseGame } from '../src';
-import { ParseTree } from '../src';
-import { TagKeys, PgnMove } from '@mliebelt/pgn-types';
+import { ParseTree, PgnMove, parseGame } from '../src';
+import { tag } from './test-game';
 
 const xtest = (_exampleSkippedTest: string, _p: () => void) => {};
 function parsePgn(string: string): PgnMove[] {
     return (<ParseTree>parseGame(string, { startRule: 'pgn' })).moves;
 }
-
-let tag = function (pt: ParseTree, tag: TagKeys): string {
-    if (!pt.tags) {
-        return '';
-    }
-    if (pt.tags && pt.tags[tag]) {
-        return pt.tags[tag];
-    }
-    return '';
-};
 
 const completeWithFirst = suite(
     'When reading complete game starting with the first move'
