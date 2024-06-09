@@ -299,19 +299,21 @@ integerQuoted =
 	quotationMark digits:[0-9]+ quotationMark { return makeInteger(digits); }
 
 pgn
-  = BOM? whitespaceOptional cm:comments? whitespaceOptional mn:moveNumber? whitespaceOptional hm:halfMove whitespaceOptional nag:nags? dr:drawOffer? whitespaceOptional ca:comments? whitespaceOptional vari:variation? all:pgn?
+  = BOM? whitespaceOptional cm:comments? whitespaceOptional mn:moveNumber? whitespaceOptional hm:halfMove whitespaceOptional nags:nags? dr:drawOffer? whitespaceOptional ca:comments? whitespaceOptional vari:variation? all:pgn?
     { 
         var arr = (all ? all : []);
         var move = {}; 
         move.moveNumber = mn; 
         move.notation = hm;
-        if (ca) { move.commentAfter = ca.comment };
+        if (ca) { 
+          move.commentDiag = ca;
+          move.commentAfter = ca.comment;
+        };
         if (cm) { move.commentMove = cm.comment };
         if (dr) { move.drawOffer = true };
         move.variations = (vari ? vari : []); 
-        move.nag = (nag ? nag : null);
+        move.nags = (nags ? nags : undefined);
         arr.unshift(move); 
-        move.commentDiag = ca;
         return arr; 
     }
   / whitespaceOptional e:endGame whitespaceOptional { return e; }
@@ -475,26 +477,70 @@ space
     = " "+ { return ''; }
 
 halfMove
-  = fig:figure? & checkdisc disc:discriminator str:strike?
+  = fig:figure? & checkdisc disc:discriminator strike:strike?
     col:column row:row pr:promotion? ch:check? whitespaceOptional 'e.p.'?
-    { var hm = {}; hm.fig = (fig ? fig : null); hm.disc =  (disc ? disc : null); hm.strike = (str ? str : null);
-    hm.col = col; hm.row = row; hm.check = (ch ? ch : null); hm.promotion = pr;
-    hm.notation = (fig ? fig : "") + (disc ? disc : "") + (str ? str : "") + col + row + (pr ? pr : "") + (ch ? ch : "");
-    return hm; }
-  / fig:figure? cols:column rows:row str:strikeOrDash? col:column row:row pr:promotion? ch:check?
-    { var hm = {}; hm.fig = (fig ? fig : null); hm.strike = (str =='x' ? str : null); hm.col = col; hm.row = row;
-    hm.notation = (fig && (fig!=='P') ? fig : "") + cols + rows + (str=='x' ? str : "-") + col  + row + (pr ? pr : "") + (ch ? ch : "");
-    hm.check = (ch ? ch : null); hm.promotion = pr; return hm; }
-  / fig:figure? str:strike? col:column row:row pr:promotion? ch:check?
-    { var hm = {}; hm.fig = (fig ? fig : null); hm.strike = (str ? str : null); hm.col = col;
-    hm.row = row; hm.check = (ch ? ch : null); hm.promotion = pr;
-    hm.notation = (fig ? fig : "") + (str ? str : "") + col  + row + (pr ? pr : "") + (ch ? ch : ""); return hm; }
-  / 'O-O-O' ch:check? { var hm = {}; hm.notation = 'O-O-O'+ (ch ? ch : ""); hm.check = (ch ? ch : null); return  hm; }
-  / 'O-O' ch:check? { var hm = {}; hm.notation = 'O-O'+ (ch ? ch : ""); hm.check = (ch ? ch : null); return  hm; }
+    { 
+      return {
+        piece: fig || undefined,
+        discriminator: disc,
+        strike: strike || undefined,
+        file: col,
+        rank: row,
+        check: ch || undefined,
+        promotion: pr || undefined,
+        notation: (fig ? fig : "") + (disc ? disc : "") + (strike ? strike : "") + col + row + (pr ? pr : "") + (ch ? ch : "")
+      };
+    }
+  / fig:figure? cols:column rows:row strike:strikeOrDash? col:column row:row pr:promotion? ch:check?
+    { 
+      return {
+        piece: fig || undefined,
+        strike: strike === 'x' ? strike : undefined,
+        file: col,
+        rank: row,
+        notation: (fig && fig !== 'P' ? fig : "") + cols + rows + (strike === 'x' ? strike : "-") + col + row + (pr ? pr : "") + (ch ? ch : ""),
+        check: ch || undefined,
+        promotion: pr || undefined,
+      };
+    }
+  / fig:figure? strike:strike? col:column row:row pr:promotion? ch:check?
+    { 
+      return {
+        piece: fig || undefined,
+        strike: strike || undefined,
+        file: col,
+        rank: row,
+        check: ch || undefined,
+        promotion: pr || undefined,
+        notation: (fig ? fig : "") + (strike ? strike : "") + col  + row + (pr ? pr : "") + (ch ? ch : "")
+      }; 
+    }
+  / 'O-O-O' ch:check?
+    { 
+      return {
+        notation: 'O-O-O' + (ch ? ch : ""),
+        check: ch || undefined,
+      };
+    }
+  / 'O-O' ch:check? 
+    { 
+      return {
+        notation: 'O-O' + (ch ? ch : ""),
+        check: ch || undefined,
+      };
+    }
   / fig:figure '@' col:column row:row
-    { var hm = {}; hm.fig = fig; hm.drop = true; hm.col = col; hm.row = row; hm.notation = fig + '@' + col + row; return hm; }
+    { 
+      return {
+        piece: fig,
+        file: col,
+        rank: row,
+        notation: fig + '@' + col + row,
+        drop: true,
+      };
+    }
   / "Z0"
-     { var hm = {}; hm.notation = "Z0"; return hm; }
+     { return { notation: 'Z0' }; }
 
 check
   = ch:(! '+-' '+') { return ch[1]; }

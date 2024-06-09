@@ -11,8 +11,8 @@ function parsePgn(string: string): PgnMove[] {
 
 const shouldAbleToSplitOneGame = suite('When reading games in UCI/CSV format');
 
-shouldAbleToSplitOneGame('should handle the plain UCI format', function () {
-    let res = parsePgn('c5c4 g3g7 g8g7 f5f6 g7f6 h5b5');
+shouldAbleToSplitOneGame('should handle the plain UCI format', () => {
+    const res = parsePgn('c5c4 g3g7 g8g7 f5f6 g7f6 h5b5');
     assert.ok(res);
 });
 

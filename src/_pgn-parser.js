@@ -778,18 +778,20 @@ function peg$parse(input, options) {
   var peg$f88 = function() { return { value: '-' }};
   var peg$f89 = function(value) { return { value, int: parseInt(value) }};
   var peg$f90 = function(digits) { return makeInteger(digits); };
-  var peg$f91 = function(cm, mn, hm, nag, dr, ca, vari, all) { 
+  var peg$f91 = function(cm, mn, hm, nags, dr, ca, vari, all) { 
         var arr = (all ? all : []);
         var move = {}; 
         move.moveNumber = mn; 
         move.notation = hm;
-        if (ca) { move.commentAfter = ca.comment };
+        if (ca) { 
+          move.commentDiag = ca;
+          move.commentAfter = ca.comment;
+        };
         if (cm) { move.commentMove = cm.comment };
         if (dr) { move.drawOffer = true };
         move.variations = (vari ? vari : []); 
-        move.nag = (nag ? nag : null);
+        move.nags = (nags ? nags : undefined);
         arr.unshift(move); 
-        move.commentDiag = ca;
         return arr; 
     };
   var peg$f92 = function(e) { return e; };
@@ -872,20 +874,62 @@ function peg$parse(input, options) {
   var peg$f142 = function(num) { return num; };
   var peg$f143 = function(digits) { return makeInteger(digits); };
   var peg$f144 = function() { return ''; };
-  var peg$f145 = function(fig, disc, str, col, row, pr, ch) { var hm = {}; hm.fig = (fig ? fig : null); hm.disc =  (disc ? disc : null); hm.strike = (str ? str : null);
-    hm.col = col; hm.row = row; hm.check = (ch ? ch : null); hm.promotion = pr;
-    hm.notation = (fig ? fig : "") + (disc ? disc : "") + (str ? str : "") + col + row + (pr ? pr : "") + (ch ? ch : "");
-    return hm; };
-  var peg$f146 = function(fig, cols, rows, str, col, row, pr, ch) { var hm = {}; hm.fig = (fig ? fig : null); hm.strike = (str =='x' ? str : null); hm.col = col; hm.row = row;
-    hm.notation = (fig && (fig!=='P') ? fig : "") + cols + rows + (str=='x' ? str : "-") + col  + row + (pr ? pr : "") + (ch ? ch : "");
-    hm.check = (ch ? ch : null); hm.promotion = pr; return hm; };
-  var peg$f147 = function(fig, str, col, row, pr, ch) { var hm = {}; hm.fig = (fig ? fig : null); hm.strike = (str ? str : null); hm.col = col;
-    hm.row = row; hm.check = (ch ? ch : null); hm.promotion = pr;
-    hm.notation = (fig ? fig : "") + (str ? str : "") + col  + row + (pr ? pr : "") + (ch ? ch : ""); return hm; };
-  var peg$f148 = function(ch) { var hm = {}; hm.notation = 'O-O-O'+ (ch ? ch : ""); hm.check = (ch ? ch : null); return  hm; };
-  var peg$f149 = function(ch) { var hm = {}; hm.notation = 'O-O'+ (ch ? ch : ""); hm.check = (ch ? ch : null); return  hm; };
-  var peg$f150 = function(fig, col, row) { var hm = {}; hm.fig = fig; hm.drop = true; hm.col = col; hm.row = row; hm.notation = fig + '@' + col + row; return hm; };
-  var peg$f151 = function() { var hm = {}; hm.notation = "Z0"; return hm; };
+  var peg$f145 = function(fig, disc, strike, col, row, pr, ch) { 
+      return {
+        piece: fig || undefined,
+        discriminator: disc,
+        strike: strike || undefined,
+        file: col,
+        rank: row,
+        check: ch || undefined,
+        promotion: pr || undefined,
+        notation: (fig ? fig : "") + (disc ? disc : "") + (strike ? strike : "") + col + row + (pr ? pr : "") + (ch ? ch : "")
+      };
+    };
+  var peg$f146 = function(fig, cols, rows, strike, col, row, pr, ch) { 
+      return {
+        piece: fig || undefined,
+        strike: strike === 'x' ? strike : undefined,
+        file: col,
+        rank: row,
+        notation: (fig && fig !== 'P' ? fig : "") + cols + rows + (strike === 'x' ? strike : "-") + col + row + (pr ? pr : "") + (ch ? ch : ""),
+        check: ch || undefined,
+        promotion: pr || undefined,
+      };
+    };
+  var peg$f147 = function(fig, strike, col, row, pr, ch) { 
+      return {
+        piece: fig || undefined,
+        strike: strike || undefined,
+        file: col,
+        rank: row,
+        check: ch || undefined,
+        promotion: pr || undefined,
+        notation: (fig ? fig : "") + (strike ? strike : "") + col  + row + (pr ? pr : "") + (ch ? ch : "")
+      }; 
+    };
+  var peg$f148 = function(ch) { 
+      return {
+        notation: 'O-O-O' + (ch ? ch : ""),
+        check: ch || undefined,
+      };
+    };
+  var peg$f149 = function(ch) { 
+      return {
+        notation: 'O-O' + (ch ? ch : ""),
+        check: ch || undefined,
+      };
+    };
+  var peg$f150 = function(fig, col, row) { 
+      return {
+        piece: fig,
+        file: col,
+        rank: row,
+        notation: fig + '@' + col + row,
+        drop: true,
+      };
+    };
+  var peg$f151 = function() { return { notation: 'Z0' }; };
   var peg$f152 = function(ch) { return ch[1]; };
   var peg$f153 = function(ch) { return ch[1]; };
   var peg$f154 = function(f) { return '=' + f; };

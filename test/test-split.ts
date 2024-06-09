@@ -5,7 +5,7 @@ import { normalizeLineEndings } from '../src/split-games';
 import fs from 'fs';
 
 function splitGames(string: string): SplitGame[] {
-    return split(string, { startRule: 'games' });
+    return split(string);
 }
 
 const xtest = (exampleSkippedTest: string, p: () => void) => {};

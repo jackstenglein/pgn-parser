@@ -179,76 +179,130 @@ export type Tags = { [key in StringTagKeys]?: string } & {
     [key: string]: string | PgnDate | PgnTime | TimeControl;
 };
 
+/** The key type of the computed Tags. */
 export type TagKeys = keyof Tags;
+
+/** The player with the move. */
+export type Turn = 'w' | 'b';
+
+/** A comment with arrows, highlights and other commands. */
+export type DiagramComment = {
+    /** The text portion of the comment. Only present for game comments. */
+    comment?: string;
+
+    /** Arrows drawn on the board. */
+    colorArrows?: string[];
+
+    /** Squares highlighted on the board. */
+    colorFields?: string[];
+
+    /** The value of the %clk command. */
+    clk?: string;
+
+    /** The value of the %egt command. */
+    egt?: string;
+
+    /** The value of the %emt command. */
+    emt?: string;
+
+    /** The value of the %mct command. */
+    mct?: string;
+
+    /** The value of the %eval command. */
+    eval?: string;
+};
+
+/** A single move in the PGN */
+export type PgnMove = {
+    /** The number of the move. */
+    moveNumber: number;
+
+    /** The player who made this move. */
+    turn: Turn;
+
+    /** The notation of the move. */
+    notation: {
+        /** The full value of the notation in the PGN. */
+        notation: string;
+
+        /**
+         * The piece moved. Only present if included in the PGN notation.
+         * IE: for O-O and e4, it will not be present.
+         */
+        piece?: 'R' | 'N' | 'B' | 'Q' | 'K' | 'P';
+
+        /** The PGN character notation for capturing. Only included if present in the PGN. */
+        strike?: 'x';
+
+        /**
+         * The rank the piece was moved to. Only present if included in the PGN notation.
+         * IE: for O-O and O-O-O, it will not be present.
+         */
+        rank?: '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8';
+
+        /**
+         * The file the piece was moved to. Only present if included in the PGN notation.
+         * IE: for O-O and O-O-O, it will not be present.
+         */
+        file?: 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h';
+
+        /** The symbol for check or checkmate. */
+        check?: '+' | '#';
+
+        /** The promotion of the move. IE: `=Q` */
+        promotion?: string;
+
+        /** The piece discriminator if it was present in the PGN. Ex: `a` in `Rae1` */
+        discriminator?: string;
+
+        /** Whether the piece was dropped. Only present/true for Crazyhouse. */
+        drop?: boolean;
+    };
+
+    /** Variations of this move in the PGN. */
+    variations: PgnMove[][];
+
+    /** Whether a draw was offered on the move. */
+    drawOffer?: boolean;
+
+    /** NAGs on this move in the PGN. */
+    nags?: string[];
+
+    /** Diagram comments left on this move. */
+    commentDiag?: DiagramComment;
+
+    /** Comments left before the move. */
+    commentMove?: string;
+
+    /** Comments left after the move. */
+    commentAfter?: string;
+};
 
 /** A message emitted by the PGN parser while parsing. */
 export type Message = { key: string; value: string; message: string };
-export type MessagesObject = { messages: Message[] };
 
-export type GameComment = {
-    comment?: string;
-    colorArrows?: string[];
-    colorFields?: string[];
-    clk?: string;
-    egt?: string;
-    emt?: string;
-    mct?: string;
-    eval?: string;
-};
-export type PgnMove = {
-    drawOffer: boolean;
-    moveNumber: number;
-    notation: {
-        fig?: string | null;
-        strike?: 'x' | null;
-        col: string;
-        row: string;
-        check?: string;
-        promotion: string | null;
-        notation: string;
-        disc?: string;
-        drop?: boolean;
-    };
-    variations: PgnMove[][];
-    nag: string[];
-    commentDiag: GameComment;
-    commentMove?: string;
-    commentAfter?: string;
-    turn: 'w' | 'b';
-};
-
-/* From pgn-writer */
-export const PROMOTIONS = {
-    q: 'queen',
-    r: 'rook',
-    b: 'bishop',
-    n: 'knight',
-};
-
-export const prom_short = ['q', 'r', 'b', 'n'] as const;
-export type PROMOTIONS_SHORT = (typeof prom_short)[number];
-
-export const colors = ['white', 'black'] as const;
-export const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'] as const;
-export const ranks = ['1', '2', '3', '4', '5', '6', '7', '8'] as const;
-
-export type File = (typeof files)[number];
-export type Rank = (typeof ranks)[number];
-export type Field = 'a0' | `${File}${Rank}`;
-
-export type Color = 'w' | 'b';
-
+/** The types of strings that can be parsed by the parse functions. */
 export type StartRule = 'pgn' | 'game' | 'tags' | 'games' | undefined;
-export type PgnOptions<SR extends StartRule> = { startRule: SR; fen?: string };
+
+/** The options that can be passed to the parse functions. */
+export type ParseOptions<SR extends StartRule> = { startRule: SR; fen?: string };
 
 /** The response type of the parse functions. */
 export type ParseResponseType<SR extends StartRule> = SR extends 'games'
     ? ParseTree[]
     : ParseTree;
 
+/** The result of running the parser on a single PGN. */
 export type ParseTree = {
+    /** The tags, if they were present in the PGN. */
     tags?: Tags;
-    gameComment?: GameComment;
+
+    /** The game comment (comment before the first move), if it exists in the PGN. */
+    gameComment?: DiagramComment;
+
+    /** The moves in the PGN. */
     moves: PgnMove[];
-} & MessagesObject;
-export type Turn = 'w' | 'b';
+
+    /** Messages emitted during parsing. */
+    messages: Message[];
+};
