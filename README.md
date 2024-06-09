@@ -1,10 +1,10 @@
 # pgn-parser
 
-[![GitHub Workflow Status](https://github.com/mliebelt/pgn-parser/actions/workflows/nodejs.yml/badge.svg)](https://github.com/mliebelt/pgn-parser/actions)
-[![GitHub package.json version](https://img.shields.io/github/package-json/v/mliebelt/pgn-parser?color=33aa33&label=Version&logo=npm)](https://www.npmjs.com/package/@mliebelt/pgn-parser)
-[![npm](https://img.shields.io/npm/dm/@mliebelt/pgn-parser?label=Downloads&logo=npm)](https://www.npmjs.com/package/@mliebelt/pgn-parser)
-[![GitHub](https://img.shields.io/github/license/mliebelt/pgn-parser?label=License)](https://github.com/mliebelt/pgn-parser/blob/main/LICENSE)
-[![Libraries.io dependency status for GitHub repo](https://img.shields.io/librariesio/github/mliebelt/pgn-parser)](https://libraries.io/npm/@mliebelt%2Fpgn-parser)
+[![GitHub Workflow Status](https://github.com/jackstenglein/pgn-parser/actions/workflows/nodejs.yml/badge.svg)](https://github.com/jackstenglein/pgn-parser/actions)
+[![GitHub package.json version](https://img.shields.io/github/package-json/v/jackstenglein/pgn-parser?color=33aa33&label=Version&logo=npm)](https://www.npmjs.com/package/@jackstenglein/pgn-parser)
+[![npm](https://img.shields.io/npm/dm/@jackstenglein/pgn-parser?label=Downloads&logo=npm)](https://www.npmjs.com/package/@jackstenglein/pgn-parser)
+[![GitHub](https://img.shields.io/github/license/jackstenglein/pgn-parser?label=License)](https://github.com/jackstenglein/pgn-parser/blob/main/LICENSE)
+[![Libraries.io dependency status for GitHub repo](https://img.shields.io/librariesio/github/jackstenglein/pgn-parser)](https://libraries.io/npm/@jackstenglein%2Fpgn-parser)
 
 Javascript library to allow reading of a PGN (Portable Game Notation) chess game notation, and providing the result as JSON.
 
@@ -17,15 +17,15 @@ notated, so that computer programs like the [PgnViewerJS](https://github.com/mli
 
 Everyone that wants to implement chess software and has to read PGN notation. The library is a runtime component to be included in the usual way.
 
-    import { parse } from '@mliebelt/pgn-parser'
+    import { parse } from '@jackstenglein/pgn-parser'
 
 or
 
-    let parse = require("@mliebelt/pgn-parser").parse
+    let parse = require("@jackstenglein/pgn-parser").parse
 
 ## How to install it?
 
-    npm i @mliebelt/pgn-parser --save
+    npm i @jackstenglein/pgn-parser --save
 
 ## How to use it?
 
@@ -40,7 +40,7 @@ It does not have an API, just a JSON structure that has to be read then. You hav
 
 A code example to read a complete game then looks like:
 ```javascript
-import { parse } from '@mliebelt/pgn-parser'
+import { parse } from '@jackstenglein/pgn-parser'
 let game = parse('[White "Me"] [Black "Magnus"] 1. f4 e5 2. g4 Qh4#', {startRule: "game"})
 console.log(JSON.stringify(game, null, 2))
 ```
@@ -70,12 +70,12 @@ See the example `doc/read-sample.js` that can be directly used in the shell: `no
 You can use `pgn-parser` as a command line tool for parsing PGN files to JSON
 
 ``` bash
-npm install --global @mliebelt/pgn-parser
+npm install --global @jackstenglein/pgn-parser
 pgn-parser file.pgn
 
 # Or
 
-npx @mliebelt/pgn-parser file.pgn
+npx @jackstenglein/pgn-parser file.pgn
 ```
 
 The optional parameter `-p` emits the result pretty-printed.
