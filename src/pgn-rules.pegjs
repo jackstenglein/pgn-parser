@@ -264,9 +264,9 @@ timeControls = tcnqs:(
     head:timeControl
     tail:(':' m:timeControl { return m; })*
     { 
-        let ret = [head].concat(tail); 
-        ret.value = ret.map(ret => ret.value).join(':');
-        return ret;
+        const items = [head].concat(tail);
+        const value = items.map(item => item.value).join(':');
+        return { value, items };
     }
 )? { return tcnqs; }
 

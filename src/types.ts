@@ -173,7 +173,9 @@ export type Elo = {
 /** The value of all the tags, as computed by the PGN parser. */
 export type Tags = { [key in StringTagKeys]?: string } & {
     [key in DateTagKeys]?: PgnDate;
-} & { [key in TimeTagKeys]?: PgnTime } & { [key in TimeControlKeys]?: TimeControl[] } & {
+} & { [key in TimeTagKeys]?: PgnTime } & {
+    [key in TimeControlKeys]?: { value: string; items: TimeControl[] };
+} & {
     [key in EloTagKeys]?: Elo;
 } & {
     [key: string]: string | PgnDate | PgnTime | TimeControl;
