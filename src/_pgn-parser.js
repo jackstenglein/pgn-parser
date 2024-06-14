@@ -756,9 +756,9 @@ function peg$parse(input, options) {
     };
   var peg$f71 = function(head, m) { return m; };
   var peg$f72 = function(head, tail) { 
-        let ret = [head].concat(tail); 
-        ret.value = ret.map(ret => ret.value).join(':');
-        return ret;
+        const items = [head].concat(tail);
+        const value = items.map(item => item.value).join(':');
+        return { value, items };
     };
   var peg$f73 = function(tcnqs) { return tcnqs; };
   var peg$f74 = function() { return { kind: 'unknown', value: '?' }; };
