@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.0.1](https://www.npmjs.com/package/@jackstenglein/pgn-parser/v/2.0.1) 2024-06-13
+
+### Fixed
+
+-   Corrected the type of the `TimeControl` tag to an array of `TimeControl` objects.
+
 ## [2.0.0](https://www.npmjs.com/package/@jackstenglein/pgn-parser/v/2.0.0) 2024-06-09
 
 ### Changes
