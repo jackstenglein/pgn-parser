@@ -221,7 +221,7 @@ _ "whitespace"
 Escape
   = "\\"
 
-dateString = quotationMark year:([0-9\?] [0-9\?] [0-9\?] [0-9\?]) '.' month:([0-9\?] [0-9\?]) '.' day:([0-9\?] [0-9\?]) quotationMark
+dateString = quotationMark year:([0-9\?] [0-9\?] [0-9\?] [0-9\?]) [\-\.\/] month:([0-9\?] [0-9\?]) [\-\.\/] day:([0-9\?] [0-9\?]) quotationMark
 	{ 
         let val = "" + year.join("") + '.' + month.join("") + '.' + day.join("");
 	    return { value: val, year: mi(year), month: mi(month), day: mi(day) }; 

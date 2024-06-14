@@ -101,6 +101,22 @@ whenWorkingWithTags('should read game conclusion and misc', () => {
     assert.is(tags?.Mode, 'OTB');
     assert.is(tags?.PlyCount, 17);
 });
+whenWorkingWithTags('should handle non-standard date formats', () => {
+    const { tags } = parseTags(
+        '[Date "2024-06-14"] [EventDate "2020/05/02"] [EventSponsor "USCF"] [Section "A"] ' +
+            '[Stage "Final"] [Board "1"]'
+    );
+
+    assert.is(tags?.Date?.value, '2024.06.14');
+    assert.is(tags?.Date?.year, 2024);
+    assert.is(tags?.Date?.month, 6);
+    assert.is(tags?.Date?.day, 14);
+
+    assert.is(tags?.EventDate?.value, '2020.05.02');
+    assert.is(tags?.EventDate?.year, 2020);
+    assert.is(tags?.EventDate?.month, 5);
+    assert.is(tags?.EventDate?.day, 2);
+});
 whenWorkingWithTags.run();
 
 const eloTags = suite('When working with ELO tags');
