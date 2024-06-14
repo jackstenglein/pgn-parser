@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.0.3](https://www.npmjs.com/package/@jackstenglein/pgn-parser/v/2.0.3) 2024-06-14
+
+### Changed
+
+-   Parser now reads non-standard date formats in the PGN header: yyyy-mm-dd and yyyy/mm/dd.
+
 ## [2.0.2](https://www.npmjs.com/package/@jackstenglein/pgn-parser/v/2.0.2) 2024-06-14
 
 ## Fixed
