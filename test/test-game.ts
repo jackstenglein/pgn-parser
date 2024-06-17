@@ -123,13 +123,19 @@ beingMoreRobust('when reading game ending', () => {
     res = parseGame('37. cxb7 Rxh3# { Wunderschön! } 0-1 ');
     assert.ok(res);
     assert.is(res.moves[1].commentAfter, 'Wunderschön!');
-    //assert.is(res.moves[2], "0-1")
+    assert.is(res.tags?.Result, '0-1');
 });
 
 beingMoreRobust('should read result including whitespace', () => {
     const res = parseGame('27. Ng2 Qxg2# 0-1 ');
     assert.ok(res);
-    //assert.is(res.moves[2], "0-1")
+    assert.is(res.tags?.Result, '0-1');
+});
+
+beingMoreRobust('should understand single game with tags only', () => {
+    const res = parseGame('[White "Magnus Carlsen"]\n[Black "Fabiano Caruana"]\n\n*');
+    assert.is(res.tags?.White, 'Magnus Carlsen');
+    assert.is(res.tags?.Black, 'Fabiano Caruana');
 });
 beingMoreRobust.run();
 
@@ -174,6 +180,11 @@ gameWithComment('should read mix of arrows and circles with other comments', () 
     assert.is(fields.length, 1);
     assert.is(fields[0], 'Rd4');
     assert.is(res.gameComment?.comment, 'comment1 comment2');
+});
+gameWithComment('should read game comment with missing result', () => {
+    const res = parseGame('[White "Magnus Carlsen"]\n\n{test}');
+    assert.is(res.tags?.White, 'Magnus Carlsen');
+    assert.is(res.gameComment?.comment, 'test');
 });
 gameWithComment.run();
 

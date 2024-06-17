@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.0.4](https://www.npmjs.com/package/@jackstenglein/pgn-parser/v/2.0.4) 2024-06-17
+
+### Changed
+
+-   Parser can now read games that have a game comment but no result in the move text, although these games violate the PGN standard.
+
 ## [2.0.3](https://www.npmjs.com/package/@jackstenglein/pgn-parser/v/2.0.3) 2024-06-14
 
 ### Changed

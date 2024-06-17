@@ -56,9 +56,15 @@ games = BOM? whitespaceOptional games:(
 
 game = BOM? tags:tags? gameComment:comments? moves:pgn
     {
-        var mess = messages; 
-        messages = [];
-        return { tags: tags.tags, gameComment, moves, messages: mess }; 
+      var mess = messages;
+      messages = [];
+      return { tags: tags.tags, gameComment, moves, messages: mess };
+    }
+    / BOM? tags:tags? gameComment:comments moves:pgn?
+    {
+      var mess = messages;
+      messages = [];
+      return { tags: tags.tags, gameComment, moves: moves || [], messages: mess };
     }
 
 tags = BOM? whitespaceOptional members:(

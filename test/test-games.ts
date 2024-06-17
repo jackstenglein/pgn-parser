@@ -112,6 +112,23 @@ readingMore('should read 4 minimal games (not obvious)', () => {
     assert.ok(res);
     assert.is(res.length, 4);
 });
+readingMore('should understand 2 games without moves or result', () => {
+    const res = parseGames(
+        '[White "Magnus Carlsen"]\n\n{test1}\n\n[Black "Magnus Carlsen"]\n\n{test2}'
+    );
+    assert.is(res.length, 2);
+    assert.is(res[0].tags?.White, 'Magnus Carlsen');
+    assert.is(res[0].gameComment?.comment, 'test1');
+    assert.is(res[1].tags?.Black, 'Magnus Carlsen');
+    assert.is(res[1].gameComment?.comment, 'test2');
+});
+readingMore('should understand 2 games without first tags, moves or result', () => {
+    const res = parseGames('{test1}\n\n[Black "Magnus Carlsen"]\n\n{test2}');
+    assert.is(res.length, 2);
+    assert.is(res[0].gameComment?.comment, 'test1');
+    assert.is(res[1].tags?.Black, 'Magnus Carlsen');
+    assert.is(res[1].gameComment?.comment, 'test2');
+});
 readingMore.run();
 
 const postProcessing = suite('When doing post processing of many games');
