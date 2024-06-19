@@ -94,8 +94,14 @@ export enum TimeControlKind {
     /** The time control specifies a certain amount of time plus an increment for a certain number of moves. */
     MovesInSecondsWithIncrement = 'movesInSecondsIncrement',
 
+    /** The time control specifies a certain amount of time plus a delay for a certain number of moves. */
+    MovesInSecondsWithDelay = 'movesInSecondsDelay',
+
     /** The time control specifies a starting amount of time plus an increment. */
     SecondsWithIncrement = 'increment',
+
+    /** The time control specifies a starting amount of time plus a delay. */
+    SecondsWithDelay = 'delay',
 
     /** The time control specifies a single amount of time in the period. */
     SuddenDeath = 'suddenDeath',
@@ -120,6 +126,9 @@ export type TimeControl = {
 
     /** The amount of incremental seconds for the time control. */
     increment?: number;
+
+    /** The amount of delay seconds for the time control. */
+    delay?: number;
 };
 
 /** The names of tags related to the date of the game. */

@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.0.5](https://www.npmjs.com/package/@jackstenglein/pgn-parser/v/2.0.5) 2024-06-19
+
+### Changed
+
+-   Parser now understands a custom notation for delay time controls.
+
 ## [2.0.4](https://www.npmjs.com/package/@jackstenglein/pgn-parser/v/2.0.4) 2024-06-17
 
 ### Changed

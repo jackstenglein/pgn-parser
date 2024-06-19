@@ -278,11 +278,13 @@ timeControls = tcnqs:(
 
 timeControl = '?' { return { kind: 'unknown', value: '?' }; }
     / '-' { return { kind: 'unlimited', value: '-' }; }
-    / moves:integer "/" seconds:integer '+' incr:integer { return { kind: 'movesInSecondsIncrement', moves: moves, seconds: seconds, increment: incr, value: `${moves}/${seconds}+${incr}` }; }
-    / moves:integer "/" seconds:integer { return { kind: 'movesInSeconds', moves: moves, seconds: seconds, value: `${moves}/${seconds}` }; }
-    / seconds:integer '+' incr:integer { return { kind: 'increment', seconds: seconds, increment: incr, value: `${seconds}+${incr}` }; }
-    / seconds:integer { return { kind: 'suddenDeath', seconds: seconds, value: `${seconds}` }; }
-    / '*' seconds:integer { return { kind: 'hourglass', seconds: seconds, value: `*${seconds}` }; }
+    / moves:integer "/" seconds:integer '+' increment:integer { return { kind: 'movesInSecondsIncrement', moves, seconds, increment, value: `${moves}/${seconds}+${increment}` }; }
+    / moves:integer "/" seconds:integer 'd' delay:integer { return { kind: 'movesInSecondsDelay', moves, seconds, delay, value: `${moves}/${seconds}d${delay}` }; }
+    / moves:integer "/" seconds:integer { return { kind: 'movesInSeconds', moves, seconds, value: `${moves}/${seconds}` }; }
+    / seconds:integer '+' increment:integer { return { kind: 'increment', seconds, increment, value: `${seconds}+${increment}` }; }
+    / seconds:integer 'd' delay:integer { return { kind: 'delay', seconds, delay, value: `${seconds}d${delay}` }; }
+    / seconds:integer { return { kind: 'suddenDeath', seconds, value: `${seconds}` }; }
+    / '*' seconds:integer { return { kind: 'hourglass', seconds, value: `*${seconds}` }; }
 
 resultQuoted = quotationMark res:result quotationMark { return res; }
 result =

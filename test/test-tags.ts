@@ -1,6 +1,6 @@
 import { suite } from 'uvu';
 import assert from 'uvu/assert';
-import { parse } from '../src';
+import { TimeControlKind, parse } from '../src';
 import { ParseTree } from '../src';
 
 function parseTags(string: string): ParseTree {
@@ -355,7 +355,7 @@ timeControlTags('should read TimeControl tag of kind unknown', () => {
     const { tags } = parseTags('[TimeControl "?"]');
     assert.ok(tags);
     assert.ok(tags?.TimeControl);
-    assert.is(tags?.TimeControl?.items[0].kind, 'unknown');
+    assert.is(tags?.TimeControl?.items[0].kind, TimeControlKind.Unknown);
     assert.is(tags?.TimeControl?.items[0].value, '?');
     assert.is(tags?.TimeControl.value, '?');
 });
@@ -363,7 +363,7 @@ timeControlTags('should read TimeControl tag of kind unlimited', () => {
     const { tags } = parseTags('[TimeControl "-"]');
     assert.ok(tags);
     assert.ok(tags?.TimeControl);
-    assert.is(tags?.TimeControl?.items[0].kind, 'unlimited');
+    assert.is(tags?.TimeControl?.items[0].kind, TimeControlKind.Unlimited);
     assert.is(tags?.TimeControl?.items[0].value, '-');
     assert.is(tags?.TimeControl.value, '-');
 });
@@ -371,17 +371,42 @@ timeControlTags('should read TimeControl tag of kind movesInSeconds', () => {
     const { tags } = parseTags('[TimeControl "40/9000"]');
     assert.ok(tags);
     assert.ok(tags?.TimeControl);
-    assert.is(tags?.TimeControl?.items[0].kind, 'movesInSeconds');
+    assert.is(tags?.TimeControl?.items[0].kind, TimeControlKind.MovesInSeconds);
     assert.is(tags?.TimeControl?.items[0].moves, 40);
     assert.is(tags?.TimeControl?.items[0].seconds, 9000);
     assert.is(tags?.TimeControl?.items[0].value, '40/9000');
     assert.is(tags?.TimeControl.value, '40/9000');
 });
+timeControlTags('should read TimeControl tag of kind movesInSecondsIncrement', () => {
+    const { tags } = parseTags('[TimeControl "40/9000+30"]');
+    assert.ok(tags);
+    assert.ok(tags?.TimeControl);
+    assert.is(
+        tags?.TimeControl?.items[0].kind,
+        TimeControlKind.MovesInSecondsWithIncrement
+    );
+    assert.is(tags?.TimeControl?.items[0].moves, 40);
+    assert.is(tags?.TimeControl?.items[0].seconds, 9000);
+    assert.is(tags?.TimeControl?.items[0].increment, 30);
+    assert.is(tags?.TimeControl?.items[0].value, '40/9000+30');
+    assert.is(tags?.TimeControl.value, '40/9000+30');
+});
+timeControlTags('should read TimeControl tag of kind movesInSecondsDelay', () => {
+    const { tags } = parseTags('[TimeControl "40/9000d30"]');
+    assert.ok(tags);
+    assert.ok(tags?.TimeControl);
+    assert.is(tags?.TimeControl?.items[0].kind, TimeControlKind.MovesInSecondsWithDelay);
+    assert.is(tags?.TimeControl?.items[0].moves, 40);
+    assert.is(tags?.TimeControl?.items[0].seconds, 9000);
+    assert.is(tags?.TimeControl?.items[0].delay, 30);
+    assert.is(tags?.TimeControl?.items[0].value, '40/9000d30');
+    assert.is(tags?.TimeControl.value, '40/9000d30');
+});
 timeControlTags('should read TimeControl tag of kind suddenDeath', () => {
     const { tags } = parseTags('[TimeControl "60"]');
     assert.ok(tags);
     assert.ok(tags?.TimeControl);
-    assert.is(tags?.TimeControl?.items[0].kind, 'suddenDeath');
+    assert.is(tags?.TimeControl?.items[0].kind, TimeControlKind.SuddenDeath);
     assert.is(tags?.TimeControl?.items[0].seconds, 60);
     assert.is(tags?.TimeControl?.items[0].value, '60');
     assert.is(tags?.TimeControl.value, '60');
@@ -390,17 +415,25 @@ timeControlTags('should read TimeControl tag of kind increment', () => {
     const { tags } = parseTags('[TimeControl "60+1"]');
     assert.ok(tags);
     assert.ok(tags?.TimeControl);
-    assert.is(tags?.TimeControl?.items[0].kind, 'increment');
+    assert.is(tags?.TimeControl?.items[0].kind, TimeControlKind.SecondsWithIncrement);
     assert.is(tags?.TimeControl?.items[0].seconds, 60);
     assert.is(tags?.TimeControl?.items[0].increment, 1);
     assert.is(tags?.TimeControl?.items[0].value, '60+1');
     assert.is(tags?.TimeControl.value, '60+1');
 });
+timeControlTags('should read TimeControl tag of kind delay', () => {
+    const { tags } = parseTags('[TimeControl "60d1"]');
+    assert.is(tags?.TimeControl?.items[0].kind, TimeControlKind.SecondsWithDelay);
+    assert.is(tags?.TimeControl?.items[0].seconds, 60);
+    assert.is(tags?.TimeControl?.items[0].delay, 1);
+    assert.is(tags?.TimeControl?.items[0].value, '60d1');
+    assert.is(tags?.TimeControl?.value, '60d1');
+});
 timeControlTags('should read TimeControl tag of kind hourglass', () => {
     const { tags } = parseTags('[TimeControl "*60"]');
     assert.ok(tags);
     assert.ok(tags?.TimeControl);
-    assert.is(tags?.TimeControl?.items[0].kind, 'hourglass');
+    assert.is(tags?.TimeControl?.items[0].kind, TimeControlKind.Hourglass);
     assert.is(tags?.TimeControl?.items[0].seconds, 60);
     assert.is(tags?.TimeControl?.items[0].value, '*60');
     assert.is(tags?.TimeControl.value, '*60');
@@ -410,11 +443,11 @@ timeControlTags(
     () => {
         const { tags } = parseTags('[TimeControl "40/7200:3600"]');
         assert.ok(tags);
-        assert.is(tags?.TimeControl?.items[0]?.kind, 'movesInSeconds');
+        assert.is(tags?.TimeControl?.items[0]?.kind, TimeControlKind.MovesInSeconds);
         assert.is(tags?.TimeControl?.items[0]?.seconds, 7200);
         assert.is(tags?.TimeControl?.items[0]?.moves, 40);
         assert.is(tags?.TimeControl?.items[0]?.value, '40/7200');
-        assert.is(tags?.TimeControl?.items[1]?.kind, 'suddenDeath');
+        assert.is(tags?.TimeControl?.items[1]?.kind, TimeControlKind.SuddenDeath);
         assert.is(tags?.TimeControl?.items[1]?.seconds, 3600);
         assert.is(tags?.TimeControl?.items[1]?.value, '3600');
         assert.is(tags?.TimeControl?.value, '40/7200:3600');
@@ -425,7 +458,10 @@ timeControlTags(
     () => {
         const { tags } = parseTags('[TimeControl "40/6000+30:3000+30"]');
         assert.ok(tags);
-        assert.is(tags?.TimeControl?.items[0].kind, 'movesInSecondsIncrement');
+        assert.is(
+            tags?.TimeControl?.items[0].kind,
+            TimeControlKind.MovesInSecondsWithIncrement
+        );
         assert.is(tags?.TimeControl?.items[0].moves, 40);
         assert.is(tags?.TimeControl?.items[0].seconds, 6000);
         assert.is(tags?.TimeControl?.items[0].increment, 30);
