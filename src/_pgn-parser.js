@@ -695,7 +695,7 @@ function peg$parse(input, options) {
   var peg$f27 = function(value) { return { name: 'EventSponsor', value: value }; };
   var peg$f28 = function(value) { return { name: 'Section', value: value }; };
   var peg$f29 = function(value) { return { name: 'Stage', value: value }; };
-  var peg$f30 = function(value) { return { name: 'Board', value: value }; };
+  var peg$f30 = function(value) { return { name: 'Board', value: { value: `${value}`, int: value } }; };
   var peg$f31 = function(value) { return { name: 'Opening', value: value }; };
   var peg$f32 = function(value) { return { name: 'Variation', value: value }; };
   var peg$f33 = function(value) { return { name: 'SubVariation', value: value }; };
@@ -710,7 +710,7 @@ function peg$parse(input, options) {
   var peg$f42 = function(value) { return { name: 'Termination', value: value }; };
   var peg$f43 = function(value) { return { name: 'Annotator', value: value }; };
   var peg$f44 = function(value) { return { name: 'Mode', value: value }; };
-  var peg$f45 = function(value) { return { name: 'PlyCount', value: value }; };
+  var peg$f45 = function(value) { return { name: 'PlyCount', value: { value: `${value}`, int: value } }; };
   var peg$f46 = function(value) { return { name: 'Variant', value: value }; };
   var peg$f47 = function(value) { return { name: 'WhiteRatingDiff', value: value }; };
   var peg$f48 = function(value) { return { name: 'BlackRatingDiff', value: value }; };

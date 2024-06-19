@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.0.6](https://www.npmjs.com/package/@jackstenglein/pgn-parser/v/2.0.6) 2024-06-19
+
+### Breaking Changes
+
+-   The type of the `Board` and `PlyCount` tags have been changed from integers to objects of the form `{value: string, int: number}`.
+
 ## [2.0.5](https://www.npmjs.com/package/@jackstenglein/pgn-parser/v/2.0.5) 2024-06-19
 
 ### Changed

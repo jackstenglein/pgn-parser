@@ -69,7 +69,7 @@ whenWorkingWithTags('should read all event related information', () => {
     assert.is(tags?.EventSponsor, 'USCF');
     assert.is(tags?.Section, 'A');
     assert.is(tags?.Stage, 'Final');
-    assert.is(tags?.Board, 1);
+    assert.equal(tags?.Board, { value: '1', int: 1 });
 });
 whenWorkingWithTags(
     'should read all opening information (local specific and third party vendors)',
@@ -99,7 +99,7 @@ whenWorkingWithTags('should read game conclusion and misc', () => {
     assert.is(tags?.Termination, 'death');
     assert.is(tags?.Annotator, 'Me');
     assert.is(tags?.Mode, 'OTB');
-    assert.is(tags?.PlyCount, 17);
+    assert.equal(tags?.PlyCount, { value: '17', int: 17 });
 });
 whenWorkingWithTags('should handle non-standard date formats', () => {
     const { tags } = parseTags(
@@ -235,7 +235,7 @@ tryDifferentVariations('should allow some variations in upper- and lowercase', (
     assert.is(tags?.White, 'Me');
     assert.equal(tags?.WhiteElo, { value: '2400', int: 2400 });
     assert.is(tags?.EventDate?.value, '2020.12.24');
-    assert.is(tags?.PlyCount, 23);
+    assert.equal(tags?.PlyCount, { value: '23', int: 23 });
 });
 tryDifferentVariations('should allow variations of SetUp and WhiteELO', () => {
     const { tags } = parseTags('[Setup "1"][WhiteElo "2700"]');

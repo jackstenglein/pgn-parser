@@ -33,7 +33,7 @@ export type PlayerTagKeys =
     | 'BlackType';
 
 /** The names of tags related to event information. */
-export type EventTagKeys = 'EventSponsor' | 'Section' | 'Stage' | 'Board';
+export type EventTagKeys = 'EventSponsor' | 'Section' | 'Stage';
 
 /** The names of tags related to openings. */
 export type OpeningTagKeys = 'Opening' | 'Variation' | 'SubVariation' | 'ECO' | 'NIC';
@@ -45,7 +45,7 @@ export type AlternativeStartingKeys = 'SetUp' | 'FEN';
 export type GameConclusionTagKeys = 'Termination';
 
 /** The names of miscellaneous tags. */
-export type MiscTagKeys = 'Annotator' | 'Mode' | 'PlyCount';
+export type MiscTagKeys = 'Annotator' | 'Mode';
 
 /** The names of tags used by Lichess. */
 export type LichessTagKeys =
@@ -168,10 +168,16 @@ export type PgnTime = {
 };
 
 /** The names of tags related to player ELO. */
-export type EloTagKeys = 'WhiteElo' | 'BlackElo' | 'WhiteUSCF' | 'BlackUSCF';
+export type IntTagKeys =
+    | 'WhiteElo'
+    | 'BlackElo'
+    | 'WhiteUSCF'
+    | 'BlackUSCF'
+    | 'PlyCount'
+    | 'Board';
 
-/** The value of an ELO tag, as computed by the PGN parser. */
-export type Elo = {
+/** The value of an integer tag, as computed by the PGN parser. */
+export type IntTagValue = {
     /** The raw value in the PGN header. */
     value?: string;
 
@@ -185,7 +191,7 @@ export type Tags = { [key in StringTagKeys]?: string } & {
 } & { [key in TimeTagKeys]?: PgnTime } & {
     [key in TimeControlKeys]?: { value: string; items: TimeControl[] };
 } & {
-    [key in EloTagKeys]?: Elo;
+    [key in IntTagKeys]?: IntTagValue;
 } & {
     [key: string]: string | PgnDate | PgnTime | TimeControl;
 };

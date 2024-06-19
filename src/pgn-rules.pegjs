@@ -106,7 +106,7 @@ tagKeyValue = eventKey whitespaceOptional value:string { return { name: 'Event',
 	/ eventSponsorKey whitespaceOptional value:string  { return { name: 'EventSponsor', value: value }; }
 	/ sectionKey whitespaceOptional value:string  { return { name: 'Section', value: value }; }
 	/ stageKey whitespaceOptional value:string  { return { name: 'Stage', value: value }; }
-	/ boardKey whitespaceOptional value:integerQuoted  { return { name: 'Board', value: value }; }
+	/ boardKey whitespaceOptional value:integerQuoted  { return { name: 'Board', value: { value: `${value}`, int: value } }; }
 	/ openingKey whitespaceOptional value:string  { return { name: 'Opening', value: value }; }
 	/ variationKey whitespaceOptional value:string  { return { name: 'Variation', value: value }; }
 	/ subVariationKey whitespaceOptional value:string  { return { name: 'SubVariation', value: value }; }
@@ -121,7 +121,7 @@ tagKeyValue = eventKey whitespaceOptional value:string { return { name: 'Event',
 	/ terminationKey whitespaceOptional value:string  { return { name: 'Termination', value: value }; }
 	/ annotatorKey whitespaceOptional value:string  { return { name: 'Annotator', value: value }; }
 	/ modeKey whitespaceOptional value:string  { return { name: 'Mode', value: value }; }
-	/ plyCountKey whitespaceOptional value:integerQuoted  { return { name: 'PlyCount', value: value }; }
+	/ plyCountKey whitespaceOptional value:integerQuoted  { return { name: 'PlyCount', value: { value: `${value}`, int: value } }; }
 	/ variantKey whitespaceOptional value:string { return { name: 'Variant', value: value }; }
 	/ whiteRatingDiffKey whitespaceOptional value:string { return { name: 'WhiteRatingDiff', value: value }; }
 	/ blackRatingDiffKey whitespaceOptional value:string { return { name: 'BlackRatingDiff', value: value }; }
