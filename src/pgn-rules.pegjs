@@ -548,7 +548,9 @@ halfMove
       };
     }
   / "Z0"
-     { return { notation: 'Z0' }; }
+    { return { notation: 'Z0' }; }
+  / "--"
+    { return { notation: 'Z0' }; }
 
 check
   = ch:(! '+-' '+') { return ch[1]; }

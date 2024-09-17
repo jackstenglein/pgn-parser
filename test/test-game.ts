@@ -96,6 +96,16 @@ workingWithOneGame('handles game with null move', () => {
     assert.is(res.moves[2].notation.notation, 'd4');
     assert.is(res.moves[2].turn, 'w');
 });
+workingWithOneGame('handles game with alternate null move syntax', () => {
+    const res = parseGame('1. e4 -- 2. d4 1-0');
+    assert.is(tag(res, 'Result'), '1-0');
+    assert.is(res.moves.length, 3);
+    assert.is(res.moves[0].notation.notation, 'e4');
+    assert.is(res.moves[1].notation.notation, 'Z0');
+    assert.is(res.moves[1].turn, 'b');
+    assert.is(res.moves[2].notation.notation, 'd4');
+    assert.is(res.moves[2].turn, 'w');
+});
 workingWithOneGame.run();
 
 const beingMoreRobust = suite('When reading one game be more robust');

@@ -793,7 +793,7 @@ complexOrErrors('should allow alternative syntax for catching exceptions', () =>
             assert.is(err.name, 'SyntaxError');
             assert.is(
                 err.message,
-                'Expected "O-O", "O-O-O", "Z0", "x", [RNBQKP], [a-h], or whitespace but "." found.'
+                'Expected "--", "O-O", "O-O-O", "Z0", "x", [RNBQKP], [a-h], or whitespace but "." found.'
             );
             return true;
         }
@@ -829,6 +829,13 @@ complexOrErrors.run();
 const parsingNullMoves = suite('Parsing pgn notation with null moves');
 parsingNullMoves('should allow null moves inserted', () => {
     const res: PgnMove[] = parsePgn('1. e4 e5 2. Z0 Nc6 3. Z0 Nf6');
+    assert.ok(res);
+    assert.is(res.length, 6);
+    assert.is(res[2].notation.notation, 'Z0');
+    assert.is(res[4].notation.notation, 'Z0');
+});
+parsingNullMoves('should allow alternate null moves inserted', () => {
+    const res: PgnMove[] = parsePgn('1. e4 e5 2. -- Nc6 3. -- Nf6');
     assert.ok(res);
     assert.is(res.length, 6);
     assert.is(res[2].notation.notation, 'Z0');

@@ -545,6 +545,13 @@ readingStrangeFormats(
         assert.ok(tags);
     }
 );
+readingStrangeFormats('should understand tags with escaped quotes (#309)', () => {
+    const { tags } = parseTags(
+        `[Event "Bg7 in the Sicilian: 2.Nf3 d6 3.Bc4 - The \\"Closed\\" Dragon"]`
+    );
+    assert.ok(tags);
+    assert.is(tags.Event, `Bg7 in the Sicilian: 2.Nf3 d6 3.Bc4 - The "Closed" Dragon`);
+});
 readingStrangeFormats(
     'should understand all tags even with strange characters (#349)',
     () => {

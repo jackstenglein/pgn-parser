@@ -193,7 +193,7 @@ export type Tags = { [key in StringTagKeys]?: string } & {
 } & {
     [key in IntTagKeys]?: IntTagValue;
 } & {
-    [key: string]: string | PgnDate | PgnTime | TimeControl;
+    [key: string]: string | PgnDate | PgnTime | TimeControl | IntTagValue;
 };
 
 /** The key type of the computed Tags. */
