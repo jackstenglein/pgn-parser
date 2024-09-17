@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.0.7](https://www.npmjs.com/package/@jackstenglein/pgn-parser/v/2.0.7) 2024-09-17
+
+### Changed
+
+-   Added support for null moves using the `--` syntax
+-   Added `IntTagValue` to the `Tags` type
+
 ## [2.0.6](https://www.npmjs.com/package/@jackstenglein/pgn-parser/v/2.0.6) 2024-06-19
 
 ### Breaking Changes
