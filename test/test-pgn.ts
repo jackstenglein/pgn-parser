@@ -714,6 +714,15 @@ parsingNAGs('should understand multiple NAGs', () => {
     assert.is(res[1].nags?.[1], '$23');
     assert.is(res[1].nags?.[2], '$47');
 });
+parsingNAGs('should understand non-standard NAGs', () => {
+    const res = parsePgn('1. Nbd7 += Qh4 =+');
+    assert.is(res.length, 2);
+
+    assert.is(res[0].nags?.length, 1);
+    assert.is(res[0].nags?.[0], '$14');
+    assert.is(res[1].nags?.length, 1);
+    assert.is(res[1].nags?.[0], '$15');
+});
 parsingNAGs.run();
 
 const parsingPromotions = suite('Parsing PGN game with all kinds of promotions');

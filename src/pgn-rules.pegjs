@@ -575,9 +575,11 @@ nag
   / '⁉' { return '$5'; }
   / '⁈' { return '$6'; }
   / '□' { return '$7'; }
+  / '=+' { return '$15';}
   / '=' { return '$10'; }
   / '∞' { return '$13'; }
   / '⩲' { return '$14'; }
+  / '+=' { return '$14'; }
   / '⩱' { return '$15';}
   / '±' { return '$16';}
   / '∓' { return '$17';}
