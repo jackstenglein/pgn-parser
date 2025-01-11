@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.0.8](https://www.npmjs.com/package/@jackstenglein/pgn-parser/v/2.0.8) 2024-12-14
+
+### Changed
+
+-   Added support for SCID += and =+ NAG syntax
+
 ## [2.0.7](https://www.npmjs.com/package/@jackstenglein/pgn-parser/v/2.0.7) 2024-09-17
 
 ### Changed
