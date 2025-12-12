@@ -319,7 +319,7 @@ pgn
         };
         if (cm) { move.commentMove = cm.comment };
         if (dr) { move.drawOffer = true };
-        move.variations = (vari ? vari : []); 
+        move.variations = (vari ? vari : []);
         move.nags = (nags ? nags : undefined);
         arr.unshift(move); 
         return arr; 
@@ -547,9 +547,7 @@ halfMove
         drop: true,
       };
     }
-  / "Z0"
-    { return { notation: 'Z0' }; }
-  / "--"
+  / ("Z0" / "--")
     { return { notation: 'Z0' }; }
 
 check

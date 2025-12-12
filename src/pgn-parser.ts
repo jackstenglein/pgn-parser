@@ -36,20 +36,24 @@ export function parseGames<SR extends StartRule>(
     input: string,
     options: ParseOptions<SR> = { startRule: 'games' as SR }
 ): ParseTree[] {
-    const gamesOptions = Object.assign({ startRule: 'games' }, options);
-    const result = PegParser.parse(input, gamesOptions) as ParseTree[];
-    if (!result || !Array.isArray(result) || result.length === 0) {
-        return [];
-    }
+    try {
+        const gamesOptions = Object.assign({ startRule: 'games' }, options);
+        const result = PegParser.parse(input, gamesOptions) as ParseTree[];
+        if (!result || !Array.isArray(result) || result.length === 0) {
+            return [];
+        }
 
-    // Removes potentially empty parse tree at the end of the input
-    const last: ParseTree | undefined = result.pop();
-    if (last && (last.tags !== undefined || last.moves.length > 0)) {
-        result.push(last);
-    }
+        // Removes potentially empty parse tree at the end of the input
+        const last: ParseTree | undefined = result.pop();
+        if (last && (last.tags !== undefined || last.moves.length > 0)) {
+            result.push(last);
+        }
 
-    result.forEach((pt) => postParseGame(pt, gamesOptions));
-    return result;
+        result.forEach((pt) => postParseGame(pt, gamesOptions));
+        return result;
+    } catch (err) {
+        throw parseError(input, err);
+    }
 }
 
 /**
@@ -62,21 +66,24 @@ export function parseGame<SR extends StartRule>(
     input: string,
     options: ParseOptions<SR> = { startRule: 'game' as SR }
 ): ParseTree {
-    input = input.trim();
+    try {
+        input = input.trim();
+        const result = PegParser.parse(input, options);
+        let res2: ParseTree = { moves: [] as PgnMove[], messages: [] };
 
-    const result = PegParser.parse(input, options);
-    let res2: ParseTree = { moves: [] as PgnMove[], messages: [] };
+        if (options.startRule === 'pgn') {
+            res2.moves = result;
+        } else if (options.startRule === 'tags') {
+            res2.tags = result.tags;
+            res2.messages = result.messages;
+        } else {
+            res2 = result;
+        }
 
-    if (options.startRule === 'pgn') {
-        res2.moves = result;
-    } else if (options.startRule === 'tags') {
-        res2.tags = result.tags;
-        res2.messages = result.messages;
-    } else {
-        res2 = result;
+        return postParseGame(res2, options);
+    } catch (err) {
+        throw parseError(input, err);
     }
-
-    return postParseGame(res2, options);
 }
 
 /**
@@ -173,4 +180,53 @@ function setTurnRecursive(move: PgnMove, currentTurn: Turn): Turn {
     });
 
     return switchTurn(currentTurn);
+}
+
+/**
+ * Handles parsing errors and enhances the error object with a detailed error hint.
+ * @param pgn The PGN string that was being parsed
+ * @param error The error that occurred during parsing
+ * @returns The enhanced error object
+ */
+function parseError(pgn: string, error: any): any {
+    if (!error?.location?.start) {
+        error.hint = `Error parsing PGN (no location information available): ${error.message || 'Unknown error'}`;
+        return error;
+    }
+
+    const line = error.location.start.line;
+    const column = error.location.start.column;
+
+    const lines = pgn.split('\n');
+
+    // Create context with a few lines before and after the error
+    const contextStart = Math.max(0, line - 3);
+    const contextEnd = Math.min(lines.length, line + 2);
+    const contextLines: string[] = [];
+
+    for (let i = contextStart; i < contextEnd; i++) {
+        const lineNum = i + 1;
+        let lineContent = lines[i] || '';
+
+        // If this is the error line, mark the error position
+        if (lineNum === line) {
+            if (column <= lineContent.length) {
+                // Insert ** before the character at the error position
+                lineContent =
+                    lineContent.substring(0, column - 1) +
+                    '**' +
+                    lineContent.substring(column - 1);
+            } else {
+                // Error is at the end of the line
+                lineContent += '**';
+            }
+        }
+
+        contextLines.push(`${lineNum}: ${lineContent}`);
+    }
+
+    // Create the error hint
+    error.errorHint = `Error at line ${line}, column ${column}:\n${contextLines.join('\n')}`;
+
+    return error;
 }

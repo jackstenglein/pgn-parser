@@ -106,6 +106,22 @@ workingWithOneGame('handles game with alternate null move syntax', () => {
     assert.is(res.moves[2].notation.notation, 'd4');
     assert.is(res.moves[2].turn, 'w');
 });
+workingWithOneGame('should read game comment before the moves', function () {
+    const input =
+        '[Event "London Opening: Introduction"]\n' +
+        '[Site "https://lichess.org/study/pLBSiPGF/wdGlcwDu"]\n' +
+        '[Result "*"]\n' +
+        '[Variant "Standard"]\n' +
+        '[ECO "D00"]\n' +
+        '[Opening "Queen\'s Pawn Game: Accelerated London System"]\n' +
+        '[Annotator "https://lichess.org/@/Sbernsto"]\n' +
+        '[UTCDate "2024.05.20"]\n' +
+        '[UTCTime "15:09:38"]\n' +
+        '\n' +
+        "{ Hi! You've probably heard about an opening for white called the London System. In this study, I will teach you the basics of this popular opening. } 1. d4 { We will be starting with d4. It is not as aggressive as e4 can be but d4 is a good middleground between aggressive and solid games.}";
+    const res: ParseTree = parseGame(input);
+    assert.ok(res.gameComment);
+});
 workingWithOneGame.run();
 
 const beingMoreRobust = suite('When reading one game be more robust');
