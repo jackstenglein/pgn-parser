@@ -200,9 +200,6 @@ whitespaceOptional "whitespace" = [ \t\n\r]*
 whitespaceRequired "whitespace" = [ \t\n\r]+
 eol "end of line" = [\n\r]+
 
-esc_quotation
-  = '\\"' { return  '\"'; }
-
 stringNoQuote
   = chars:[-a-zA-Z0-9_.]* { return chars.join(""); }
 
@@ -218,6 +215,7 @@ stringChar
     sequence:(
         "\\" { return {type: "char", char: "\\"}; }
       / '"' { return {type: "char", char: '"'}; }
+      / "'" { return { type: "char", char: "'" }}
     )
     { return sequence; }
 

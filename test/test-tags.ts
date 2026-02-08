@@ -117,6 +117,12 @@ whenWorkingWithTags('should handle non-standard date formats', () => {
     assert.is(tags?.EventDate?.month, 5);
     assert.is(tags?.EventDate?.day, 2);
 });
+whenWorkingWithTags(`should handle chess.com let's play event header`, () => {
+    const { tags } = parseTags(`[Event "Let\\'s Play!"] [Site "Chess.com"]`);
+
+    assert.is(tags?.Event, `Let's Play!`);
+    assert.is(tags?.Site, 'Chess.com');
+})
 whenWorkingWithTags.run();
 
 const eloTags = suite('When working with ELO tags');

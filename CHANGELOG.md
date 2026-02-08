@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.0.10](https://www.npmjs.com/package/@jackstenglein/pgn-parser/v/2.0.10) 2026-02-08
+
+### Changed
+
+- Add support for single quote in headers
+
 ## [2.0.9](https://www.npmjs.com/package/@jackstenglein/pgn-parser/v/2.0.9) 2025-12-11
 
 ### Changed
