@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.0.11](https://www.npmjs.com/package/@jackstenglein/pgn-parser/v/2.0.11) 2026-02-21
+
+### Changed
+
+- Add support for PGN commands in comments without values (e.g., [%EOG])
+
 ## [2.0.10](https://www.npmjs.com/package/@jackstenglein/pgn-parser/v/2.0.10) 2026-02-08
 
 ### Changed
