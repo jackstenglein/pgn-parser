@@ -523,6 +523,17 @@ gameWithComments('should have undefined for move with no comments', () => {
     assert.is(res[0].commentMove, undefined);
     assert.is(res[0].commentAfter, undefined);
 });
+gameWithComments('should understand commands without values', () => {
+    const res = parsePgn('1. e4 {[%EOG]}');
+    assert.ok(res[0].commentDiag);
+    assert.is(res[0].commentDiag.EOG, true);
+});
+gameWithComments('should understand commands with and without values', () => {
+    const res = parsePgn('1. e4 {[%emt 0:19:00] [%EOG]}');
+    assert.ok(res[0].commentDiag);
+    assert.is(res[0].commentDiag.emt, '0:19:00');
+    assert.is(res[0].commentDiag.EOG, true);
+});
 gameWithComments.run();
 
 const clockCommands = suite('Parsing PGN with clockCommands with unusual format');
