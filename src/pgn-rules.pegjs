@@ -352,6 +352,8 @@ innerComment
         { var ret = {};  ret["eval"]= parseFloat(ev); return merge([ret].concat(tail[0])) }
     / whitespaceOptional openBracket "%" ac:stringNoQuote whitespaceRequired val:nbr+ closeBracket whitespaceOptional tail:(ic:innerComment { return ic })*
         { var ret = {}; ret[ac]= val.join(""); return merge([ret].concat(tail[0])) }
+    / whitespaceOptional openBracket "%" ac:stringNoQuote whitespaceOptional closeBracket whitespaceOptional tail:(ic:innerComment { return ic })*
+        { var ret = {}; ret[ac]= true; return merge([ret].concat(tail[0])) }
     / c:nonCommand+ tail:(whitespaceOptional ic:innerComment { return ic })*
         { 
             if (tail.length > 0) { 
