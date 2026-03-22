@@ -7,7 +7,7 @@
         "peg",
         "parser"
     ],
-    "version": "2.0.12",
+    "version": "2.0.13",
     "homepage": "https://github.com/jackstenglein/pgn-parser/blob/master/README.md",
     "bugs": "https://github.com/jackstenglein/pgn-parser/issues",
     "main": "lib/index.umd.js",
@@ -16,11 +16,8 @@
     "files": [
         "README.md",
         "lib/index.umd.d.ts",
-        "lib/index.umd.js",
-        "doc/*",
-        "bin/*"
+        "lib/index.umd.js"
     ],
-    "bin": "./bin/pgn-to-json.js",
     "author": "jackstenglein",
     "license": "Apache-2.0",
     "repository": {
