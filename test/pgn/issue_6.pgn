@@ -1,0 +1,16 @@
+[Event "2025/2026: Cas van Noort (1682) - Sander Oude Wesselink (-)"]
+[Date "2026.03.20"]
+[White "Cas van Noort"]
+[Black "Sander Oude Wesselink"]
+[Result "0.5-0.5"]
+[WhiteElo "1682"]
+[Variant "Standard"]
+[ECO "D41"]
+[Opening "Queen's Gambit Declined: Semi-Tarrasch Defense"]
+[StudyName "2025/2026"]
+[ChapterName "Cas van Noort (1682) - Sander Oude Wesselink (-)"]
+[ChapterURL "https://lichess.org/study/eHfxbnsh/e9ZgaMQB"]
+[Annotator "https://lichess.org/@/MexicanMonkey"]
+
+{ Made a mistake in the middle game creating a big advantage for my opponent. He played really quick and I took my time, which gave me the chance to comeback. }
+1. d4 d5 2. c4 e6 3. Nf3 Nf6 4. Nc3 c5 5. cxd5 exd5 6. Bg5 Nc6 { Out of book } 7. e3 (7. Bxf6 { Should have played for one of these lines. Saw ghosts during the game. } 7... gxf6 $16 (7... Qxf6 8. Nxd5 Qd8 $16)) 7... c4 8. Be2 (8. Bxf6 { Again, should have played this. } 8... gxf6 $16 (8... Qxf6 9. Nxd5 $16)) 8... Be7 9. O-O O-O 10. b3 { I though getting the a file open for my rook and weakening the d5 pawn would be with it, but isolatting the b-pawn is may not worth it. } (10. Bxf6 Bxf6 11. e4 dxe4 12. Nxe4 $17) (10. a3 Na5 { Can't prevent Nb3 }) (10. h3 { Maybe the better option. }) 10... cxb3 11. axb3 Bg4 12. h3 (12. Ne5 Bxe2 13. Qxe2 Nxe5 14. dxe5 Ne4 15. Nxe4 dxe4 { Get's a bit messy, hard to evaluate. }) 12... Bh5 13. Nd2 { I thought pushing the e4 pawn would be a good plan. I missed that Nd2 interrupts the protection of the e4 pawne. I struggle to find a good plan here. Maybe I should have just improve the rook positions. } 13... Bxe2 14. Qxe2 a6 15. Rfc1 Rc8 16. Bxf6?! Bxf6 17. b4? Re8 (17... Nxb4 18. Rab1 Nc6 19. Rxb7) 18. Qf3?! { I thought I could put pressure on the d5 pawn. } (18. Qf1 Nxb4 19. Rab1) 18... Nxb4 19. Rcb1 a5! { Missed this in my calculations. } 20. Na4 b5 (20... b6 { I expected this move and I think it's better. As black you put your rooks behind the pawns and push pawns to win. }) 21. Nc5 Rxc5! { Totally missed the pin. } 22. dxc5 Bxa1 23. Rxa1 Qc7 24. c6 Re6 { During the game it at first felt like a good move. But I see two weak pawns now. } (24... Qxc6 25. Rxa5 { Create weaknesses }) 25. Nb3 Rxc6 26. Qe2 { Please play a4 } 26... a4? { Yes! } 27. Qxb5 Qd6?! { Felt weak } 28. Qxa4 g6 29. Nd4 (29. Qa8+ Kg7 30. Nd4 $10) 29... Ra6 30. Qe8+ Qf8 31. Qxf8+ Kxf8 32. Rxa6 { I had less then 15 min. on the clock and opponent 45 min+. Decided to simplify. } (32. Rb1 Ra4) (32. Rc1) 32... Nxa6 { I wonder if white is better here. I somehow need to get my king to e5 or h file depending on opponent king moves. Playing f4 would weaken e3. } 33. g4 { Creating a path for the king. } 33... Nb4 34. Kg2 (34. g5 { I wonder if this move is better. Decided to centralize king. }) 34... Ke7 35. Kg3 Nd3 36. h4 Kf6 37. f4 (37. g5+ Ke5 38. f4+ { Calculated this during the game. Glad I didn't blunder again. }) 37... h6 38. g5+ hxg5 39. hxg5+ Ke7 40. Kf3 Nc5 41. Ke2 { Planning to go to e4 } 41... Ne4 42. Nc6+ Kd6 43. Ne5 Ke6 44. Kd3 Ng3 45. Nc6 Nf5 46. e4 dxe4+ { Opponent offered a draw } 0.5-0.5

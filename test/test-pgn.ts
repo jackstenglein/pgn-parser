@@ -2,6 +2,7 @@ import { suite } from 'uvu';
 import assert from 'uvu/assert';
 import { ParseTree, PgnMove, parseGame } from '../src';
 import { tag } from './test-game';
+import fs from 'fs';
 
 const xtest = (_exampleSkippedTest: string, _p: () => void) => {};
 function parsePgn(string: string): PgnMove[] {
@@ -147,6 +148,11 @@ gameWithResult('should handle variation at the end even for unclear results', ()
     const res = parseGame('1. e4 (1. d4) *');
     assert.is(tag(res, 'Result'), '*');
 });
+gameWithResult('parse game using 0.5 for draw (#6)', () => {
+    const pgn = fs.readFileSync(process.cwd() + '/test/pgn/issue_6.pgn', 'utf8');
+    const res = parseGame(pgn);
+    assert.is(tag(res, 'Result'), '1/2-1/2');
+})
 gameWithResult.run();
 
 const gameWithComments = suite('Reading PGN game with all kinds of comments');
@@ -534,6 +540,15 @@ gameWithComments('should understand commands with and without values', () => {
     assert.is(res[0].commentDiag.emt, '0:19:00');
     assert.is(res[0].commentDiag.EOG, true);
 });
+gameWithComments("should understand evals mixed with normal comments", () => {
+    let game = parseGame('{ [%cal Rg4f5] (-5.03 → -2.48) Blunder. Rxh1 was best. [%eval -2.48] (player\'s move was Bf5) } 22. Rdg1  0-1');
+    assert.ok(game);
+    assert.ok(game.gameComment);
+    let arrows = game.gameComment?.colorArrows || [];
+    assert.is(arrows[0], "Rg4f5");
+    assert.is(game.gameComment?.eval, -2.48);
+    assert.is(game.gameComment?.comment, "(-5.03 → -2.48) Blunder. Rxh1 was best. (player's move was Bf5)");
+})
 gameWithComments.run();
 
 const clockCommands = suite('Parsing PGN with clockCommands with unusual format');
